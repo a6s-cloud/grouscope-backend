@@ -21,6 +21,12 @@ build() (
 
     cd laradock
     cp env-example .env
+
+    echo ''                         >> .env
+    echo 'DB_HOST=mysql'            >> .env
+    echo '# REDIS_HOST=redis'       >> .env
+    echo 'QUEUE_HOST=beanstalkd'    >> .env
+
     docker-compose up -d nginx mysql workspace
 
     sync ; sleep 3
