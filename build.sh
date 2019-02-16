@@ -51,7 +51,7 @@ check_your_environment() {
         return 1
     }
 
-    command -v docker info > /dev/null 2>&1 || {
+    docker info > /dev/null 2>&1 || {
         echo "ERROR: docker info コマンドに失敗しました。docker デーモンが起動していないか、docker コマンドを実行する権限がないかもしれません" >&2
         return 1
     }
