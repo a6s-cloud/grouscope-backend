@@ -1,7 +1,7 @@
 # a6s-cloud-backend
 
 # OVERVIEW
-`a6s-cloud` (analysis-cloud) は[twitter](https://twitter.com/)ハッシュタグ分析プラットフォームです。
+`a6s-cloud` (analysis-cloud) は[twitter](https://twitter.com/)ハッシュタグ分析プラットフォームです。
 ## Description
 
 a6s-cloud は [a6s-cloud-front](https://github.com/nsuzuki7713/a6s-cloud-front) と [a6s-cloud-backend](https://github.com/nsuzuki7713/a6s-cloud-backend) の2つのプログラムにより構成されたSPA形式のアーキテクチャを採用しており、これはそのバックエンドを担うa6s-cloud-backend のリポジトリです。
