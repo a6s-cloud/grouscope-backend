@@ -31,8 +31,33 @@ build() (
 
     sync ; sleep 3
 
-    docker-compose exec workspace runuser -l laradock -c \
-            'cd /var/www; if [ ! -d a6s-cloud ]; then composer create-project laravel/laravel a6s-cloud; else echo "NOTICE: Laravel プロジェクトが既に作成されているので処理をスキップします"; fi'
+    docker-compose exec workspace runuser -l laradock -c '
+        cd /var/www
+        if [[ ! -d a6s-cloud ]]; then
+            composer create-project laravel/laravel a6s-cloud
+        else
+            echo "NOTICE: Laravel プロジェクトが既に作成されているので処理をスキップします"
+        fi
+    '
+
+    docker-compose exec workspace bash -c '
+        if [[ -d /var/www/a6s-cloud ]]; then
+            chown -R laradock:laradock /var/www/a6s-cloud
+        else
+            echo "ERROR: /var/www/a6s-cloud ディレクトリがありません。Laravel プロジェクトの作成に失敗しました。" >&2
+            exit 1
+        fi
+    '
+
+    docker-compose exec workspace runuser -l laradock -c '
+        cd /var/www/a6s-cloud
+        composer install
+        if [[ ! -f .env ]]; then
+            cp .env.example .env
+            php artisan key:generate
+        fi
+    '
+
     if [[ ! -f nginx/sites/default.conf.bak ]]; then
         cp nginx/sites/default.conf nginx/sites/default.conf.bak
         cp nginx/sites/laravel.conf.example default.conf
