@@ -7,3 +7,10 @@
 a6s-cloud は [a6s-cloud-front](https://github.com/nsuzuki7713/a6s-cloud-front) と [a6s-cloud-backend](https://github.com/nsuzuki7713/a6s-cloud-backend) の2つのプログラムにより構成されたSPA形式のアーキテクチャを採用しており、これはそのバックエンドを担うa6s-cloud-backend のリポジトリです。
 
 `a6s-cloud` の概要、理念、開発スタイル、及び、利用方法は [a6s-cloud-front](https://github.com/nsuzuki7713/a6s-cloud-front) を御覧ください。
+
+## For Developers
+
+PHP 以外のプログラミング言語経験者、且つPHP は経験したことが無い人向けの移行チートシートがあります。
+
+[[他言語経験者向け]PHP 移行チートシート](https://a6s-cloud.kibe.la/notes/8)
+
