@@ -8,7 +8,7 @@ function errexit() {
   local err=$?
   set +o xtrace
   local code="${1:-1}"
-  echo "## Stack Trace ########################################################"
+  echo -e "## ${FONT_COLOR_RED}Stack Trace${FONT_COLOR_END} ########################################################"
   echo "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}. '${BASH_COMMAND}' exited with status $err"
   # Print out the stack trace described by $function_stack  
   if [ ${#FUNCNAME[@]} -gt 2 ]
@@ -27,6 +27,15 @@ function errexit() {
 trap '
     errexit >&2
 ' ERR
+
+# Color of font red
+FONT_COLOR_GREEN='\033[0;32m'
+# Color of font yello
+FONT_COLOR_YELLOW='\033[0;33m'
+# Color of font red
+FONT_COLOR_RED='\033[0;31m'
+# Color of font end
+FONT_COLOR_END='\033[0m'
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
