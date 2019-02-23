@@ -90,7 +90,59 @@ build() {
         sed -i -e 's|\(.*root\) .*/var/www/public.*|\1 /var/www/a6s-cloud/public;|g' nginx/sites/default.conf
     fi
 
+    init_mysql_db
     docker-compose stop && docker-compose up -d nginx mysql workspace
+}
+
+# Mysql DB のデータを初期化する
+init_mysql_db() {
+    echo "NOTICE: mysql データを初期化しています。"
+
+    docker-compose exec mysql bash -c '
+        DB_PW_DEFAULT="secret"
+        DB_PW_ROOT="root"
+        DB_NAME="a6s_cloud"
+
+        echo ">>> sql: CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+        MYSQL_PWD=${DB_PW_ROOT} mysql -u root <<< "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+        echo "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
+        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
+        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "SHOW GRANTS FOR '"'"'default'"'"'@'"'"'%'"'"';"
+
+        # TODO: 正式なテーブル名で置き換える
+        echo ">>> sql: DROP TABLE IF EXISTS articles;"
+        MYSQL_PWD=${DB_PW_ROOT} mysql -u root ${DB_NAME} <<< "DROP TABLE IF EXISTS articles, migrations, password_resets, users;"
+
+        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
+        echo ">>> sql: ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
+        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
+        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
+    '
+    # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "ALTER USER 'default'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';"
+
+    docker-compose exec workspace runuser -l laradock -c '
+        DB_PW_DEFAULT="secret"
+        DB_PW_ROOT="root"
+        DB_NAME="a6s_cloud"
+
+        cd /var/www/a6s-cloud
+
+        # .env ファイルはLaravel のプロジェクトを作成した時に自動的に
+        # .gitignore に含まれており環境ごとに変えるべきというもののようなので都度.env ファイルの中身を編集する
+        sed -i "s/^DB_HOST=.*/DB_HOST=mysql/g"                      .env
+        sed -i "s/^DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/g"         .env
+        sed -i "s/^DB_USERNAME=.*/DB_USERNAME=default/g"            .env
+        sed -i "s/^DB_PASSWORD=.*/DB_PASSWORD=${DB_PW_DEFAULT}/g"   .env
+        sync
+        echo "NOTICE: プロジェクトのDB 接続先を設定しました"
+        grep -E "(^DB_HOST|^DB_DATABASE|^DB_USERNAME)"              .env
+        echo "DB_PASSWORD=**********"
+
+        # TODO: モデル名Articles は仮名なのであとで正式なものに置換する
+        # database/migrations/YYYY_MM_DD_HHMMSS_create_articles_table.php ファイル内のDB 定義の通りにテーブルを作成する
+        php artisan migrate:refresh
+        php artisan db:seed --class=ArticlesTableSeeder
+    '
 }
 
 check_your_environment() {
