@@ -55,16 +55,7 @@ build() {
 
     docker-compose up -d nginx mysql workspace
 
-    sync ; sleep 3
-
-    docker-compose exec workspace runuser -l laradock -c '
-        cd /var/www
-        if [[ ! -d a6s-cloud ]]; then
-            composer create-project laravel/laravel a6s-cloud
-        else
-            echo "NOTICE: Laravel プロジェクトが既に作成されているので処理をスキップします"
-        fi
-    '
+    sync ; sleep 2
 
     docker-compose exec workspace bash -c '
         if [[ -d /var/www/a6s-cloud ]]; then
