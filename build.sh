@@ -1,4 +1,41 @@
 #!/usr/bin/env bash
+set -o errtrace
+set -e
+
+# Stack Trace を表示する
+# https://gist.github.com/ahendrix/7030300
+function errexit() {
+  local err=$?
+  set +o xtrace
+  local code="${1:-1}"
+  echo -e "## ${FONT_COLOR_RED}Stack Trace${FONT_COLOR_END} ########################################################"
+  echo "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}. '${BASH_COMMAND}' exited with status $err"
+  # Print out the stack trace described by $function_stack  
+  if [ ${#FUNCNAME[@]} -gt 2 ]
+  then
+    echo "Call tree:"
+    for ((i=1;i<${#FUNCNAME[@]}-1;i++))
+    do
+      echo " $i: ${BASH_SOURCE[$i+1]}:${BASH_LINENO[$i]} ${FUNCNAME[$i]}(...)"
+    done
+  fi
+  echo "Exiting with status ${code}"
+  exit "${code}"
+}
+
+# エラー終了時にerrexit を実行する
+trap '
+    errexit >&2
+' ERR
+
+# Color of font red
+FONT_COLOR_GREEN='\033[0;32m'
+# Color of font yello
+FONT_COLOR_YELLOW='\033[0;33m'
+# Color of font red
+FONT_COLOR_RED='\033[0;31m'
+# Color of font end
+FONT_COLOR_END='\033[0m'
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
@@ -6,17 +43,15 @@ EMOJI_STAR_STRUCK="🤩"
 
 main() {
     cd "$SCRIPT_DIR"
-    check_your_environment || return 1
-    build || return 1
+    check_your_environment
+    build
 
     echo "構築が完了しました${EMOJI_STAR_STRUCK} 。http://localhost をWeb ブラウザで開いてWeb アプリ画面が表示されることを確認してください。"
 
     return 0
 }
 
-build() (
-    set -e
-
+build() {
     git submodule update --init --recursive
 
     cd laradock
@@ -29,18 +64,10 @@ build() (
 
     docker-compose up -d nginx mysql workspace
 
-    sync ; sleep 3
-
-    docker-compose exec workspace runuser -l laradock -c '
-        cd /var/www
-        if [[ ! -d a6s-cloud ]]; then
-            composer create-project laravel/laravel a6s-cloud
-        else
-            echo "NOTICE: Laravel プロジェクトが既に作成されているので処理をスキップします"
-        fi
-    '
+    sync ; sleep 2
 
     docker-compose exec workspace bash -c '
+        set -e
         if [[ -d /var/www/a6s-cloud ]]; then
             chown -R laradock:laradock /var/www/a6s-cloud
         else
@@ -50,6 +77,7 @@ build() (
     '
 
     docker-compose exec workspace runuser -l laradock -c '
+        set -e
         cd /var/www/a6s-cloud
         composer install
         if [[ ! -f .env ]]; then
@@ -63,8 +91,63 @@ build() (
         cp nginx/sites/laravel.conf.example default.conf
         sed -i -e 's|\(.*root\) .*/var/www/public.*|\1 /var/www/a6s-cloud/public;|g' nginx/sites/default.conf
     fi
+
+    init_mysql_db
     docker-compose stop && docker-compose up -d nginx mysql workspace
-)
+}
+
+# Mysql DB のデータを初期化する
+init_mysql_db() {
+    echo "NOTICE: mysql データを初期化しています。"
+
+    docker-compose exec mysql bash -c '
+        set -e
+        DB_PW_DEFAULT="secret"
+        DB_PW_ROOT="root"
+        DB_NAME="a6s_cloud"
+
+        echo ">>> sql: CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+        MYSQL_PWD=${DB_PW_ROOT} mysql -u root <<< "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+        echo "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
+        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
+        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SHOW GRANTS FOR '"'"'default'"'"'@'"'"'%'"'"';"
+
+        # TODO: 正式なテーブル名で置き換える
+        echo ">>> sql: DROP TABLE IF EXISTS articles;"
+        MYSQL_PWD=${DB_PW_ROOT} mysql -u root ${DB_NAME} <<< "DROP TABLE IF EXISTS articles, migrations, password_resets, users;"
+
+        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
+        echo ">>> sql: ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
+        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
+        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
+    '
+    # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "ALTER USER 'default'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';"
+
+    docker-compose exec workspace runuser -l laradock -c '
+        set -e
+        DB_PW_DEFAULT="secret"
+        DB_PW_ROOT="root"
+        DB_NAME="a6s_cloud"
+
+        cd /var/www/a6s-cloud
+
+        # .env ファイルはLaravel のプロジェクトを作成した時に自動的に
+        # .gitignore に含まれており環境ごとに変えるべきというもののようなので都度.env ファイルの中身を編集する
+        sed -i "s/^DB_HOST=.*/DB_HOST=mysql/g"                      .env
+        sed -i "s/^DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/g"         .env
+        sed -i "s/^DB_USERNAME=.*/DB_USERNAME=default/g"            .env
+        sed -i "s/^DB_PASSWORD=.*/DB_PASSWORD=${DB_PW_DEFAULT}/g"   .env
+        sync
+        echo "NOTICE: プロジェクトのDB 接続先を設定しました"
+        grep -E "(^DB_HOST|^DB_DATABASE|^DB_USERNAME)"              .env
+        echo "DB_PASSWORD=**********"
+
+        # TODO: モデル名Articles は仮名なのであとで正式なものに置換する
+        # database/migrations/YYYY_MM_DD_HHMMSS_create_articles_table.php ファイル内のDB 定義の通りにテーブルを作成する
+        php artisan migrate:refresh
+        php artisan db:seed --class=ArticlesTableSeeder
+    '
+}
 
 check_your_environment() {
     command -v docker || {
@@ -84,8 +167,5 @@ check_your_environment() {
     return 0
 }
 
-main "$@" || {
-    echo "ERROR: 処理失敗"
-    exit 1
-}
+main "$@"
 
