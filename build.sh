@@ -67,6 +67,7 @@ build() {
     sync ; sleep 2
 
     docker-compose exec workspace bash -c '
+        set -e
         if [[ -d /var/www/a6s-cloud ]]; then
             chown -R laradock:laradock /var/www/a6s-cloud
         else
@@ -76,6 +77,7 @@ build() {
     '
 
     docker-compose exec workspace runuser -l laradock -c '
+        set -e
         cd /var/www/a6s-cloud
         composer install
         if [[ ! -f .env ]]; then
@@ -99,6 +101,7 @@ init_mysql_db() {
     echo "NOTICE: mysql データを初期化しています。"
 
     docker-compose exec mysql bash -c '
+        set -e
         DB_PW_DEFAULT="secret"
         DB_PW_ROOT="root"
         DB_NAME="a6s_cloud"
@@ -106,21 +109,23 @@ init_mysql_db() {
         echo ">>> sql: CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
         MYSQL_PWD=${DB_PW_ROOT} mysql -u root <<< "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
         echo "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
-        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
-        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "SHOW GRANTS FOR '"'"'default'"'"'@'"'"'%'"'"';"
+        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
+        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SHOW GRANTS FOR '"'"'default'"'"'@'"'"'%'"'"';"
 
+        mmmmmmm
         # TODO: 正式なテーブル名で置き換える
         echo ">>> sql: DROP TABLE IF EXISTS articles;"
         MYSQL_PWD=${DB_PW_ROOT} mysql -u root ${DB_NAME} <<< "DROP TABLE IF EXISTS articles, migrations, password_resets, users;"
 
-        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
+        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
         echo ">>> sql: ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
-        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
-        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
+        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
+        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
     '
-    # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root -h mysql <<< "ALTER USER 'default'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';"
+    # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "ALTER USER 'default'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';"
 
     docker-compose exec workspace runuser -l laradock -c '
+        set -e
         DB_PW_DEFAULT="secret"
         DB_PW_ROOT="root"
         DB_NAME="a6s_cloud"
