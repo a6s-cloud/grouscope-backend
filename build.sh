@@ -112,7 +112,6 @@ init_mysql_db() {
         MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
         # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SHOW GRANTS FOR '"'"'default'"'"'@'"'"'%'"'"';"
 
-        mmmmmmm
         # TODO: 正式なテーブル名で置き換える
         echo ">>> sql: DROP TABLE IF EXISTS articles;"
         MYSQL_PWD=${DB_PW_ROOT} mysql -u root ${DB_NAME} <<< "DROP TABLE IF EXISTS articles, migrations, password_resets, users;"
