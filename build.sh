@@ -51,6 +51,13 @@ main() {
     return 0
 }
 
+function is_mac() {
+    if [ "$(uname)" == "Darwin" ] || (command -v brew > /dev/null 2>&1); then
+        return 0
+    fi
+    return 1
+}
+
 build() {
     rm -rf laradock
     git submodule update --init --recursive
@@ -62,7 +69,12 @@ build() {
     echo 'DB_HOST=mysql'            >> .env
     echo '# REDIS_HOST=redis'       >> .env
     echo 'QUEUE_HOST=beanstalkd'    >> .env
-    sed -i "" "s|^WORKSPACE_TIMEZONE=.*|WORKSPACE_TIMEZONE=Asia/Tokyo|g"  .env
+
+    if is_mac; then
+        sed -i "" -e "s|^WORKSPACE_TIMEZONE=.*|WORKSPACE_TIMEZONE=Asia/Tokyo|g"  .env
+    else
+        sed -i -e "s|^WORKSPACE_TIMEZONE=.*|WORKSPACE_TIMEZONE=Asia/Tokyo|g"  .env
+    fi
 
     docker-compose up -d nginx mysql workspace
 
