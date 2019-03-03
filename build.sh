@@ -62,7 +62,7 @@ build() {
     echo 'DB_HOST=mysql'            >> .env
     echo '# REDIS_HOST=redis'       >> .env
     echo 'QUEUE_HOST=beanstalkd'    >> .env
-    sed -i "s|^WORKSPACE_TIMEZONE=.*|WORKSPACE_TIMEZONE=Asia/Tokyo|g"  .env
+    sed -i "" "s|^WORKSPACE_TIMEZONE=.*|WORKSPACE_TIMEZONE=Asia/Tokyo|g"  .env
 
     docker-compose up -d nginx mysql workspace
 
