@@ -52,6 +52,7 @@ main() {
 }
 
 build() {
+    rm -rf laradock
     git submodule update --init --recursive
 
     cd laradock
@@ -61,6 +62,7 @@ build() {
     echo 'DB_HOST=mysql'            >> .env
     echo '# REDIS_HOST=redis'       >> .env
     echo 'QUEUE_HOST=beanstalkd'    >> .env
+    sed -i "s|^WORKSPACE_TIMEZONE=.*|WORKSPACE_TIMEZONE=Asia/Tokyo|g"  .env
 
     docker-compose up -d nginx mysql workspace
 
