@@ -26,7 +26,7 @@ class CreateAnalysisResultsTable extends Migration
             $table->binary('image')->nullable();                                // wordcloud 画像
             $table->dateTime('insert_date')->userCurrent();                     // 追加日時
             $table->dateTime('update_date')
-                  ->default(DB::raw('UPDATE CURRENT_TIMESTAMP'));               // 追加日時
+                  ->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));               // 追加日時
             $table->tinyInteger('delete_flag')->default(0);                     // 削除フラグ
         });
     }

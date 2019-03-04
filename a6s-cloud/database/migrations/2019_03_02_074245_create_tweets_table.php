@@ -27,7 +27,7 @@ class CreateTweetsTable extends Migration
             // $table->dateTimeTz('created_at');                            // 投稿時間
             $table->dateTime('insert_date')->useCurrent();                  // 追加日時
             $table->dateTime('update_date')
-                  ->default(DB::raw('ON UPDATE CURRENT_TIMESTAMP'));        // 更新日時(datetime)
+                  ->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));        // 更新日時(datetime)
             $table->tinyInteger('delete_flag')->default(0);                 // 削除フラグ
         });
     }
