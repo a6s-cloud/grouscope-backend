@@ -113,8 +113,8 @@ init_mysql_db() {
         # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SHOW GRANTS FOR '"'"'default'"'"'@'"'"'%'"'"';"
 
         # TODO: 正式なテーブル名で置き換える
-        echo ">>> sql: DROP TABLE IF EXISTS articles;"
-        MYSQL_PWD=${DB_PW_ROOT} mysql -u root ${DB_NAME} <<< "DROP TABLE IF EXISTS articles, migrations, password_resets, users;"
+        echo ">>> sql: DROP TABLE IF EXISTS analysis_results, migrations, password_resets, tweets, users;"
+        MYSQL_PWD=${DB_PW_ROOT} mysql -u root ${DB_NAME} <<< "DROP TABLE IF EXISTS analysis_results, migrations, password_resets, tweets, users;"
 
         # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
         echo ">>> sql: ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
@@ -145,7 +145,7 @@ init_mysql_db() {
         # TODO: モデル名Articles は仮名なのであとで正式なものに置換する
         # database/migrations/YYYY_MM_DD_HHMMSS_create_articles_table.php ファイル内のDB 定義の通りにテーブルを作成する
         php artisan migrate:refresh
-        php artisan db:seed --class=ArticlesTableSeeder
+        # php artisan db:seed --class=ArticlesTableSeeder
     '
 }
 
