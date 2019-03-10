@@ -14,7 +14,7 @@ class AnalysisResultListsController extends Controller
             $query = $query->where('analysis_word', 'LIKE', "%{$request->query('serach_word')}%");
         }
 
-        $query = $query->paginate(2);
+        $query = $query->paginate(100);
         return \Response::json($query);
     }
 }
