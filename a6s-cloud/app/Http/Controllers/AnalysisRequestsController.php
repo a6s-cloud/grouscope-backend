@@ -48,32 +48,60 @@ class AnalysisRequestsController extends Controller
         $statuses = $this->twitter_client->get("search/tweets", $params);
 
         // $limit = $statuses->headers['x-rate-limit-remaining'];
-        logger(print_r($statuses,true));
+        // logger(print_r($statuses,true));
 
         // logger(print_r($statuses->statuses, true));
         // analsis_resultsのデータを取得できる
         // logger(print_r($results->id, true));
 
-        foreach($statuses->statuses as $key => $value){
-            // logger($key);
-            // logger(print_r($value,true));
-            $tweet = new Tweets;
-            $tweet->analysis_result_id = $results->id;
-            $tweet->user_name = $value->user->name;
-            $tweet->user_account = $value->user->screen_name;
-            $tweet->text = $value->text;
-            $tweet->retweet_count = $value->retweet_count;
-            $tweet->favorite_count = $value->favorite_count;
-            // $tweet->created_at = $value->created_at;
-            $tweet->created_at = date("Y/n/d H:i:s", strtotime($value->created_at));
-            // logger(print_r($tweet,true));
-            // $tweet->save();
+        $total_retweet = 0;
+        $total_favorite = 0;
+        $total_tweet = 0;
+
+        for ($i=0; $i<10; $i++) {
+            logger(print_r($i,true));
+
+            foreach($statuses->statuses as $key => $value){
+                // logger($key);
+                // logger(print_r($value,true));
+                $tweet = new Tweets;
+                $tweet->analysis_result_id = $results->id;
+                $tweet->user_name = $value->user->name;
+                $tweet->user_account = $value->user->screen_name;
+                $tweet->text = $value->text;
+                $tweet->retweet_count = $value->retweet_count;
+                $tweet->favorite_count = $value->favorite_count;
+                // $tweet->created_at = $value->created_at;
+                $tweet->created_at = date("Y/n/d H:i:s", strtotime($value->created_at));
+                // logger(print_r($value->id,true));
+                // $tweet->save();
+
+                $total_retweet = $total_retweet + $value->retweet_count;
+                $total_favorite = $total_favorite + $value->favorite_count;
+                $total_tweet = $total_tweet + 1;
+                // ユーザ数をカウントする処理
+            }
+
+            // 次のリクエストを投げる
+            $params["max_id"] = $value->id - 1;
+            // logger(print_r($params, true));
+            $statuses = $this->twitter_client->get("search/tweets", $params);
+
+            // 0件なら終了
+            $tweetCount = count($statuses->statuses);
+            // logger(print_r($tweetCount,true));
+            if($tweetCount == 0){
+                break;
+            }
         }
 
         // 集計とかいろいろ
 
         // update処理
         // $results->status = 2;
-        // $results->save();
+        $results->favorite_count = $total_favorite;
+        $results->tweet_count = $total_tweet;
+        $results->favorite_count = $total_favorite;
+        $results->save();
     }
 }
