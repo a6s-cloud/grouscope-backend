@@ -10,11 +10,11 @@ class AnalysisResultListsController extends Controller
     public function index(Request $request)
     {
         $query = AnalysisResults::query();
-        if ($request->has('serach_word')) {
-            $query = $query->where('analysis_word', 'LIKE', "%{$request->query('serach_word')}%");
+        if ($request->has('search_word')) {
+            $query = $query->where('analysis_word', 'LIKE', "%{$request->query('search_word')}%");
         }
 
-        $query = $query->paginate(100);
+        $query = $query->paginate(10);
         return \Response::json($query);
     }
 }
