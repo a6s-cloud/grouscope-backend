@@ -122,15 +122,19 @@ init_mysql_db() {
 
         echo ">>> sql: CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
         MYSQL_PWD=${DB_PW_ROOT} mysql -u root <<< "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
-        echo "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
-        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
-        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SHOW GRANTS FOR '"'"'default'"'"'@'"'"'%'"'"';"
 
         echo ">>> DROP TABLE;"
         echo "SET FOREIGN_KEY_CHECKS=0;"                                                                    >  /tmp/drop_all_tables.sql
-        MYSQL_PWD=${DB_PW_ROOT} mysqldump --add-drop-table --no-data -u root ${DB_NAME} | grep "DROP TABLE" >> /tmp/drop_all_tables.sql
+        MYSQL_PWD=${DB_PW_ROOT} mysqldump --add-drop-table --no-data -u root ${DB_NAME} | grep "DROP TABLE" >> /tmp/drop_all_tables.sql || true
         echo "SET FOREIGN_KEY_CHECKS=1;"                                                                    >> /tmp/drop_all_tables.sql
-        MYSQL_PWD=${DB_PW_ROOT} mysql -u root a6s_cloud                                                     <  /tmp/drop_all_tables.sql
+
+        if [[ ! -f /tmp/drop_all_tables.sql ]]; then
+            echo "ERROR: File /tmp/drop_all_tables.sql is not found." >&2
+            exit 1
+        fi
+        if [[ "$(wc -c < foo.txt)" -ne 0 ]]; then
+            MYSQL_PWD=${DB_PW_ROOT} mysql -u root a6s_cloud                                                     <  /tmp/drop_all_tables.sql
+        fi
         rm -f /tmp/drop_all_tables.sql
 
         # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
@@ -164,6 +168,16 @@ init_mysql_db() {
         php artisan migrate:refresh
         php artisan db:seed
     '
+
+    docker-compose exec mysql bash -c '
+        set -e
+        DB_PW_ROOT="root"
+        DB_NAME="a6s_cloud"
+
+        echo "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
+        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
+    '
+
 }
 
 check_your_environment() {
