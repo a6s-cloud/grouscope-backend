@@ -114,6 +114,8 @@ build() {
 init_mysql_db() {
     echo "NOTICE: mysql データを初期化しています。"
 
+    sleep 5
+
     docker-compose exec mysql bash -c '
         set -e
         DB_PW_DEFAULT="secret"
@@ -122,15 +124,19 @@ init_mysql_db() {
 
         echo ">>> sql: CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
         MYSQL_PWD=${DB_PW_ROOT} mysql -u root <<< "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
-        echo "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
-        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
-        # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SHOW GRANTS FOR '"'"'default'"'"'@'"'"'%'"'"';"
 
         echo ">>> DROP TABLE;"
         echo "SET FOREIGN_KEY_CHECKS=0;"                                                                    >  /tmp/drop_all_tables.sql
-        MYSQL_PWD=${DB_PW_ROOT} mysqldump --add-drop-table --no-data -u root ${DB_NAME} | grep "DROP TABLE" >> /tmp/drop_all_tables.sql
+        MYSQL_PWD=${DB_PW_ROOT} mysqldump --add-drop-table --no-data -u root ${DB_NAME} | grep "DROP TABLE" >> /tmp/drop_all_tables.sql || true
         echo "SET FOREIGN_KEY_CHECKS=1;"                                                                    >> /tmp/drop_all_tables.sql
-        MYSQL_PWD=${DB_PW_ROOT} mysql -u root a6s_cloud                                                     <  /tmp/drop_all_tables.sql
+
+        if [[ ! -f /tmp/drop_all_tables.sql ]]; then
+            echo "ERROR: File /tmp/drop_all_tables.sql is not found." >&2
+            exit 1
+        fi
+        if [[ "$(wc -c < foo.txt)" -ne 0 ]]; then
+            MYSQL_PWD=${DB_PW_ROOT} mysql -u root a6s_cloud                                                     <  /tmp/drop_all_tables.sql
+        fi
         rm -f /tmp/drop_all_tables.sql
 
         # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
@@ -139,7 +145,6 @@ init_mysql_db() {
         # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
     '
     # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "ALTER USER 'default'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';"
-
     docker-compose exec workspace runuser -l laradock -c '
         set -e
         DB_PW_DEFAULT="secret"
@@ -157,10 +162,19 @@ init_mysql_db() {
         sync
         echo "NOTICE: プロジェクトのDB 接続先を設定しました"
         grep -E "(^DB_HOST|^DB_DATABASE|^DB_USERNAME)"              .env
-        echo "DB_PASSWORD=**********"
+    '
 
-        # TODO: モデル名Articles は仮名なのであとで正式なものに置換する
-        # database/migrations/YYYY_MM_DD_HHMMSS_create_articles_table.php ファイル内のDB 定義の通りにテーブルを作成する
+    docker-compose exec mysql bash -c '
+        set -e
+        DB_PW_ROOT="root"
+        DB_NAME="a6s_cloud"
+
+        echo "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
+        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
+    '
+
+    docker-compose exec workspace runuser -l laradock -c '
+        cd /var/www/a6s-cloud
         php artisan migrate:refresh
         php artisan db:seed
     '
