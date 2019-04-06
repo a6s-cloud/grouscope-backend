@@ -5,12 +5,12 @@
 〇〇を確認してください。
 
 # クローズするissue
-close #xx
-close #xx
+close #xx  
+close #xx  
 
 # このタスクで発生したissue
-#xx
-#xx
+#xx  
+#xx  
 
 # その他
 xxxxxxxxxxx
