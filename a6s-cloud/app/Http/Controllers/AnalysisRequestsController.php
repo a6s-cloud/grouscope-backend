@@ -6,6 +6,8 @@ use App\AnalysisResults;
 use App\Tweets;
 use Request;
 use Abraham\TwitterOAuth\TwitterOAuth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AnalysisRequestsController extends Controller
 {
@@ -25,6 +27,14 @@ class AnalysisRequestsController extends Controller
         // $aResult->url = $url; TODO:カラムを追加する必要あり
         $aResult->status = 1;
         $aResult->save();
+
+        // wordcloud 解析用のファイルpath を作成する
+        // TODO: uuid をつかって一意なファイル名を作成するようにしているが、念の為そのファイルが既に作成されていないかチェックすべき
+        // TODO: a6s-cloud-batch 処理成功後にこのファイルを削除する処理を追加すべき
+        $tweetsFileForWordcloud = (string) str::uuid() . ".txt";
+        $localStorage = Storage::disk('local');
+        $localStoragePath = $localStorage->getDriver()->getAdapter()->getPathPrefix();
+        // logger(print_r('次のファイルにwordcloud用tweet データを保存します[' . $localStoragePath . $tweetsFileForWordcloud . ']', true));
 
         // twitterデータ取得
         $twitter_config = config('twitter');
@@ -71,7 +81,10 @@ class AnalysisRequestsController extends Controller
                 $total_tweet = $total_tweet + 1;
                 // ユーザ数をカウントする処理を追加する
 
-                // wordcloud用のテキストファイルを作成
+                // wordcloud用のテキストファイルにtweet データを保存
+                // TODO: a6s-cloud-batch に引数として`$localStoragePath . $tweetsFileForWordcloud` を渡して
+                //       tweet データが保存されているファイルを教えてあげる必要がある
+                $storage->append($tweetsFileForWordcloud, $value->text);
             }
 
             // 次のリクエストを投げるためのpramerをセット
