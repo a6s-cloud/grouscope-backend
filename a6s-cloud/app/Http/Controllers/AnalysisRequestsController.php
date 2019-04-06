@@ -84,7 +84,7 @@ class AnalysisRequestsController extends Controller
                 // wordcloud用のテキストファイルにtweet データを保存
                 // TODO: a6s-cloud-batch に引数として`$localStoragePath . $tweetsFileForWordcloud` を渡して
                 //       tweet データが保存されているファイルを教えてあげる必要がある
-                $storage->append($tweetsFileForWordcloud, $value->text);
+                $localStorage->append($tweetsFileForWordcloud, $value->text);
             }
 
             // 次のリクエストを投げるためのpramerをセット
