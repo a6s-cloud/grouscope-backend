@@ -49,8 +49,8 @@ class AnalysisRequestsController extends Controller
         $params = ['q'=> $analysis_word,
                    'count'=> 100,
                    'result_type'=>'recent',
-                   'since'=>'2019-03-30_12:00:00_JST',
-                   'until'=>'2019-03-30_23:59:59_JST',
+                   'since'=>'2019-04-09_12:00:00_JST',
+                   'until'=>'2019-04-09_23:59:59_JST',
                   ];
         $searchTweet = $this->twitter_client->get("search/tweets", $params);
         // ツイートデータを確認
@@ -60,6 +60,7 @@ class AnalysisRequestsController extends Controller
         $total_retweet = 0;
         $total_favorite = 0;
         $total_tweet = 0;
+        $total_users_map = array();
 
         // 暫定的に最大10回のリクエストをする(1000件取得)
         for ($i=0; $i<10; $i++) {
@@ -74,6 +75,9 @@ class AnalysisRequestsController extends Controller
                 // $tweet->created_at = $value->created_at;
                 $tweet->created_at = date("Y/n/d H:i:s", strtotime($value->created_at));
                 $tweet->save();
+
+                // ユーザ数カウント用のキーを登録
+                $total_users_map[$tweet->user_account] = null;
 
                 // サマリを計算
                 $total_retweet = $total_retweet + $value->retweet_count;
@@ -99,6 +103,10 @@ class AnalysisRequestsController extends Controller
                 break;
             }
         }
+
+        // logger(print_r('Total user num -> ' . count($total_users_map) , true));
+        $aResult->user_count = count($total_users_map);
+        $aResult->save();
 
         // wordcloudを実行
 
