@@ -24,7 +24,7 @@ class AnalysisRequestsController extends Controller
         $aResult->analysis_start_date = $start_date;
         $aResult->analysis_end_date = $start_date;
         $aResult->analysis_word = $analysis_word;
-        // $aResult->url = $url; TODO:カラムを追加する必要あり
+        $aResult->url = $url;
         $aResult->status = 1;
         $aResult->save();
 
@@ -115,6 +115,7 @@ class AnalysisRequestsController extends Controller
         $aResult->favorite_count = $total_favorite;
         $aResult->tweet_count = $total_tweet;
         $aResult->favorite_count = $total_favorite;
+        $aResult->retweet_count = $total_retweet;
         $aResult->save();
 
         // IDを取得を返す
