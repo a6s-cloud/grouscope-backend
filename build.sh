@@ -134,7 +134,8 @@ init_mysql_db() {
             echo "ERROR: File /tmp/drop_all_tables.sql is not found." >&2
             exit 1
         fi
-        if [[ "$(wc -c < foo.txt)" -ne 0 ]]; then
+        if [[ "$(wc -c < /tmp/drop_all_tables.sql)" -ne 0 ]]; then
+            echo "MYSQL_PWD=****** mysql -u root a6s_cloud < /tmp/drop_all_tables.sql"
             MYSQL_PWD=${DB_PW_ROOT} mysql -u root a6s_cloud                                                     <  /tmp/drop_all_tables.sql
         fi
         rm -f /tmp/drop_all_tables.sql
