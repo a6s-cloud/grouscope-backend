@@ -2,3 +2,6 @@
 	path = laradock
 	url = https://github.com/Laradock/laradock.git
 	ignore = dirty
+[submodule "a6s-cloud-batch"]
+	path = a6s-cloud-batch
+	url = https://github.com/nsuzuki7713/a6s-cloud-batch.git
