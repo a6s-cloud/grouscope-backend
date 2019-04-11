@@ -5,3 +5,7 @@
 [submodule "a6s-cloud-batch"]
 	path = a6s-cloud-batch
 	url = https://github.com/nsuzuki7713/a6s-cloud-batch.git
+[submodule "RictyDiminished"]
+	path = RictyDiminished
+	url = https://github.com/edihbrandon/RictyDiminished.git
+	ignore = dirty
