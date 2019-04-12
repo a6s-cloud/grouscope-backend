@@ -8,6 +8,7 @@ use Request;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AnalysisRequestsController extends Controller
 {
@@ -45,12 +46,16 @@ class AnalysisRequestsController extends Controller
             $twitter_config["token_secret"]
         );
 
+        // 日付をの形式をハイフンに変換
+        $carbon = new Carbon($start_date);
+        $since = $carbon->format('Y-m-d');
+
         // twitter serch
         $params = ['q'=> $analysis_word,
                    'count'=> 100,
                    'result_type'=>'recent',
-                   'since'=>'2019-04-09_12:00:00_JST',
-                   'until'=>'2019-04-09_23:59:59_JST',
+                   'since'=> $since.'_12:00:00_JST',
+                   'until'=> $since.'_23:59:59_JST',
                   ];
         $searchTweet = $this->twitter_client->get("search/tweets", $params);
         // ツイートデータを確認
