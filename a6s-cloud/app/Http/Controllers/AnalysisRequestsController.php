@@ -8,6 +8,7 @@ use Request;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AnalysisRequestsController extends Controller
 {
@@ -19,10 +20,15 @@ class AnalysisRequestsController extends Controller
         $url = $request::input('url');
         $analysis_timing = $request::input('analysis_timing');
 
+        // 抽出日付形式をハイフンに変換
+        $carbon = new Carbon($start_date);
+        $target_start_date = $carbon->format('Y-m-d_00:00:00');
+        $target_end_date = $carbon->format('Y-m-d_23:59:59');
+
         // analysis_resultsにデータを保存
         $aResult = new AnalysisResults;
-        $aResult->analysis_start_date = $start_date;
-        $aResult->analysis_end_date = $start_date;
+        $aResult->analysis_start_date = $target_start_date;
+        $aResult->analysis_end_date = $target_end_date;
         $aResult->analysis_word = $analysis_word;
         $aResult->url = $url;
         $aResult->status = 1;
@@ -49,8 +55,8 @@ class AnalysisRequestsController extends Controller
         $params = ['q'=> $analysis_word,
                    'count'=> 100,
                    'result_type'=>'recent',
-                   'since'=>'2019-04-09_12:00:00_JST',
-                   'until'=>'2019-04-09_23:59:59_JST',
+                   'since'=> $target_start_date.'_JST',
+                   'until'=> $target_end_date.'_JST',
                   ];
         $searchTweet = $this->twitter_client->get("search/tweets", $params);
         // ツイートデータを確認
