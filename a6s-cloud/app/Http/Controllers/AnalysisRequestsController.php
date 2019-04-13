@@ -20,10 +20,15 @@ class AnalysisRequestsController extends Controller
         $url = $request::input('url');
         $analysis_timing = $request::input('analysis_timing');
 
+        // 抽出日付形式をハイフンに変換
+        $carbon = new Carbon($start_date);
+        $target_start_date = $carbon->format('Y-m-d_00:00:00');
+        $target_end_date = $carbon->format('Y-m-d_23:59:59');
+
         // analysis_resultsにデータを保存
         $aResult = new AnalysisResults;
-        $aResult->analysis_start_date = $start_date;
-        $aResult->analysis_end_date = $start_date;
+        $aResult->analysis_start_date = $target_start_date;
+        $aResult->analysis_end_date = $target_end_date;
         $aResult->analysis_word = $analysis_word;
         $aResult->url = $url;
         $aResult->status = 1;
@@ -46,16 +51,12 @@ class AnalysisRequestsController extends Controller
             $twitter_config["token_secret"]
         );
 
-        // 日付をの形式をハイフンに変換
-        $carbon = new Carbon($start_date);
-        $since = $carbon->format('Y-m-d');
-
         // twitter serch
         $params = ['q'=> $analysis_word,
                    'count'=> 100,
                    'result_type'=>'recent',
-                   'since'=> $since.'_12:00:00_JST',
-                   'until'=> $since.'_23:59:59_JST',
+                   'since'=> $target_start_date.'_JST',
+                   'until'=> $target_end_date.'_JST',
                   ];
         $searchTweet = $this->twitter_client->get("search/tweets", $params);
         // ツイートデータを確認
