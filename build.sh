@@ -145,6 +145,26 @@ init_mysql_db() {
         MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
         # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
     '
+    docker-compose exec workspace bash -c '
+        set -e
+
+        pkg_cache=$(apt list --installed 2> /dev/null | grep -v -E "Listing..." | cut -d "/" -f 1)
+        declare -a target=("python3" "python3\-pip")
+        for (( i = 0; i < ${#target[@]}; ++i )) {
+            p="${target[i]}"
+
+            if ! (grep -E "^${p}$" &> /dev/null <<< "$pkg_cache"); then
+                echo "python3, python3-pip をインストールします"
+                apt-get update
+                DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends python3 python3-pip
+                break
+            fi
+        }
+
+        for pipackage in matplotlib janome wordcloud; do
+            pip3 --disable-pip-version-check install "$pipackage"
+        done
+    '
     # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "ALTER USER 'default'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';"
     docker-compose exec workspace runuser -l laradock -c '
         set -e
