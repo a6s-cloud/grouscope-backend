@@ -145,7 +145,7 @@ init_mysql_db() {
         MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
         # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
     '
-    docker-compose exec workspace bash -c '
+    docker-compose exec php-fpm bash -c '
         set -e
 
         pkg_cache=$(apt list --installed 2> /dev/null | grep -v -E "Listing..." | cut -d "/" -f 1)
