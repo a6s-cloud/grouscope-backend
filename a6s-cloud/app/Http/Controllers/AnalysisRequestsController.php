@@ -98,6 +98,9 @@ class AnalysisRequestsController extends Controller
             }
 
             // 次のリクエストを投げるためのpramerをセット
+            if(!isset($value->id)){
+                break;
+            }
             $params["max_id"] = $value->id - 1;
 
             // 次のツイートデータを取得
