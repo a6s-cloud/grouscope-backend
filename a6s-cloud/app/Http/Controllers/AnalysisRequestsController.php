@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
 class AnalysisRequestsController extends Controller
 {
     public function create(Request $request)
@@ -50,6 +53,7 @@ class AnalysisRequestsController extends Controller
             $twitter_config["access_token"],
             $twitter_config["token_secret"]
         );
+
 
         // twitter serch
         $params = ['q'=> $analysis_word,
@@ -118,6 +122,23 @@ class AnalysisRequestsController extends Controller
         $aResult->save();
 
         // wordcloudを実行
+
+        // logger(print_r('python3 ../../a6s-cloud-batch/src/createWordCloud.py '
+        //     . $localStoragePath . $tweetsFileForWordcloud
+        //     . '../../RictyDiminished/RictyDiminished-Bold.ttf /var/www/result.png', true));
+        $process = new Process([
+            'python3',
+            '../../a6s-cloud-batch/src/createWordCloud.py',
+            $localStoragePath . $tweetsFileForWordcloud,
+            '../../RictyDiminished/RictyDiminished-Bold.ttf',
+            '/var/www/result.png'    // TODO: 出力先にはlocal storage を使うべきか
+        ]);
+        // TODO: 出力したファイルをDB に保存する処理を追加する
+        $process->run();
+        if (!$process->isSuccessful()) {
+            // TODO: HTTP ステータス500 とか返したほうが良い?
+            throw new ProcessFailedException($process);
+        }
 
         // update処理
         $aResult->status = 2;
