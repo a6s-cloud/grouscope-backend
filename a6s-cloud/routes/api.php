@@ -17,8 +17,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('analysis-results', 'AnalysisResultsController@index');
-Route::get('analysis-results/{id}', 'AnalysisResultController@show');
-
 Route::get('v1/AnalysisResultLists', 'AnalysisResultListsController@index');
 Route::post('v1/AnalysisRequests', 'AnalysisRequestsController@create');
+Route::get('v1/AnalysisResults/{id}', 'AnalysisResultsController@show');
