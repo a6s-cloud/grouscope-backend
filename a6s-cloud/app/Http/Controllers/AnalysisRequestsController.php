@@ -40,7 +40,9 @@ class AnalysisRequestsController extends Controller
         // wordcloud 解析用のファイルpath を作成する
         // TODO: uuid をつかって一意なファイル名を作成するようにしているが、念の為そのファイルが既に作成されていないかチェックすべき
         // TODO: a6s-cloud-batch 処理成功後にこのファイルを削除する処理を追加すべき
-        $tweetsFileForWordcloud = (string) str::uuid() . ".txt";
+        $uuid = (string) str::uuid();
+        $tweetsFileForWordcloud = $uuid . ".txt";
+        $imageFileForWordcloud = $uuid . ".png";
         $localStorage = Storage::disk('local');
         $localStoragePath = $localStorage->getDriver()->getAdapter()->getPathPrefix();
         // logger(print_r('次のファイルにwordcloud用tweet データを保存します[' . $localStoragePath . $tweetsFileForWordcloud . ']', true));
@@ -131,7 +133,7 @@ class AnalysisRequestsController extends Controller
             '../../a6s-cloud-batch/src/createWordCloud.py',
             $localStoragePath . $tweetsFileForWordcloud,
             '../../RictyDiminished/RictyDiminished-Bold.ttf',
-            '/var/www/result.png'    // TODO: 出力先にはlocal storage を使うべきか
+            $localStoragePath . $imageFileForWordcloud
         ]);
         // TODO: 出力したファイルをDB に保存する処理を追加する
         $process->run();
