@@ -138,8 +138,14 @@ class AnalysisRequestsController extends Controller
         // TODO: 出力したファイルをDB に保存する処理を追加する
         $process->run();
         if (!$process->isSuccessful()) {
-            // TODO: HTTP ステータス500 とか返したほうが良い?
-            throw new ProcessFailedException($process);
+            $aResult->status = 3;
+            $aResult->save();
+
+            $e = new ProcessFailedException($process);
+            logger(print_r($e->getMessage(), true));
+            logger(print_r($e->getTraceAsString(), true));
+
+            return response($aResult->id, 500);
         }
 
         // update処理
