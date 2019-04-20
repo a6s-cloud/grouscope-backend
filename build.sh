@@ -59,6 +59,8 @@ function is_mac() {
 }
 
 build() {
+    local file_php_ini=
+
     rm -rf laradock
     git submodule update --init --recursive
 
@@ -72,8 +74,14 @@ build() {
 
     if is_mac; then
         sed -i "" -e "s|^WORKSPACE_TIMEZONE=.*|WORKSPACE_TIMEZONE=Asia/Tokyo|g"  .env
+
+        while read file_php_ini; do
+            sed -i "" -e "s|^;\?date\.timezone =.*|date.timezone = Asia/Tokyo|g" $file_php_ini
+        done < <(find ./php-fpm/php*.ini)
     else
-        sed -i -e "s|^WORKSPACE_TIMEZONE=.*|WORKSPACE_TIMEZONE=Asia/Tokyo|g"  .env
+        while read file_php_ini; do
+            sed -i -e "s|^;\?date\.timezone =.*|date.timezone = Asia/Tokyo|g" $file_php_ini
+        done < <(find ./php-fpm/php*.ini)
     fi
 
     docker-compose up -d nginx mysql workspace
