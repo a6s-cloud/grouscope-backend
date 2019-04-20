@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use \DateTime;
+use \DateTimeZone;
+
 use App\AnalysisResults;
 use App\Tweets;
 use Request;
@@ -85,7 +88,8 @@ class AnalysisRequestsController extends Controller
                 $tweet->retweet_count = $value->retweet_count;
                 $tweet->favorite_count = $value->favorite_count;
                 // $tweet->created_at = $value->created_at;
-                $tweet->created_at = date("Y/n/d H:i:s", strtotime($value->created_at));
+                $tweet->created_at = (new DateTime($value->created_at))
+                                         ->setTimeZone(new DateTimeZone('Asia/Tokyo'))->format("Y/m/d H:i:s");
                 $tweet->save();
 
                 // ユーザ数カウント用のキーを登録
