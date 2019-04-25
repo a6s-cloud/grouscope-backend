@@ -7,10 +7,11 @@ use \DateTimeZone;
 
 use App\AnalysisResults;
 use App\Tweets;
-use Request;
-use Abraham\TwitterOAuth\TwitterOAuth;
+use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Abraham\TwitterOAuth\TwitterOAuth;
 use Carbon\Carbon;
 
 use Symfony\Component\Process\Process;
@@ -18,8 +19,14 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class AnalysisRequestsController extends Controller
 {
-    public function create(Request $request)
+    public function create(Request $request, HttpRequest $httpRequest)
     {
+        $httpRequest->validate([
+            'start_date' => 'required',
+            'analysis_word' => 'required',
+            'analysis_timing' => 'required'
+        ]);
+
         // パラメータを取得
         $start_date = $request::input('start_date');
         $analysis_word = $request::input('analysis_word');
