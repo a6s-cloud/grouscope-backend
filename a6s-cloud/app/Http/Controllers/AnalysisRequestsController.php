@@ -7,11 +7,11 @@ use \DateTimeZone;
 
 use App\AnalysisResults;
 use App\Tweets;
-use Request;
 use Illuminate\Http\Request as HttpRequest;
-use Abraham\TwitterOAuth\TwitterOAuth;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Abraham\TwitterOAuth\TwitterOAuth;
 use Carbon\Carbon;
 
 use Symfony\Component\Process\Process;
