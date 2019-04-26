@@ -166,6 +166,16 @@ class AnalysisRequestsController extends Controller
         $aResult->retweet_count = $total_retweet;
         $aResult->save();
 
+        // word cloudの画像を添付してツイートをする
+        // ※動作確認する場合はコメントアウトを外してくだい
+        // TODO:投稿文言は要検討
+        // $media1 = $this->twitter_client->upload('media/upload', ['media' => $localStoragePath . $imageFileForWordcloud]);
+        // $parameters = [
+        //     'status' => "実装テストちゅうです！！\nテスト",
+        //     'media_ids' => implode(',', [$media1->media_id_string]),
+        // ];
+        // $result = $this->twitter_client->post('statuses/update', $parameters);
+
         // IDを取得を返す
         return response($aResult->id, 200);
     }
