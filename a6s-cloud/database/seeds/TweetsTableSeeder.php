@@ -18,11 +18,11 @@ class TweetsTableSeeder extends Seeder
         // ダミーデータの作成
         $faker = \Faker\Factory::create('ja_JP');
         $dt = new DateTime;
-        for($i = 0; $i < 1000; $i++) {
+        for($i = 0; $i < 100; $i++) {
             Tweets::create([
-                'analysis_result_id'    => ($i % 10) + 1,
+                'analysis_result_id'    => 1,
                 'user_name'             => $faker->name,
-                'user_account'          => "@user_${i}",
+                'user_account'          => "user_${i}",
                 'text'                  => "${i} 回目のツイート",
                 'retweet_count'         => $i,
                 'favorite_count'        => $i + 10,
