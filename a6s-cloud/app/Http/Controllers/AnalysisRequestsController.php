@@ -7,8 +7,7 @@ use \DateTimeZone;
 
 use App\AnalysisResults;
 use App\Tweets;
-use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Abraham\TwitterOAuth\TwitterOAuth;
@@ -19,19 +18,19 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class AnalysisRequestsController extends Controller
 {
-    public function create(Request $request, HttpRequest $httpRequest)
+    public function create(Request $request)
     {
-        $httpRequest->validate([
+        $request->validate([
             'start_date' => 'required',
             'analysis_word' => 'required',
             'analysis_timing' => 'required'
         ]);
 
         // パラメータを取得
-        $start_date = $request::input('start_date');
-        $analysis_word = $request::input('analysis_word');
-        $url = $request::input('url');
-        $analysis_timing = $request::input('analysis_timing');
+        $start_date = $request->input('start_date');
+        $analysis_word = $request->input('analysis_word');
+        $url = $request->input('url');
+        $analysis_timing = $request->input('analysis_timing');
 
         // 抽出日付形式をハイフンに変換
         $carbon = new Carbon($start_date);
