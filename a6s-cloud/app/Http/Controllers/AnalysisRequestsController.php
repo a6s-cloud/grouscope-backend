@@ -54,7 +54,8 @@ class AnalysisRequestsController extends Controller
         $imageFileForWordcloud = $uuid . ".png";
         $localStorage = Storage::disk('local');
         $localStoragePath = $localStorage->getDriver()->getAdapter()->getPathPrefix();
-        // logger(print_r('次のファイルにwordcloud用tweet データを保存します[' . $localStoragePath . $tweetsFileForWordcloud . ']', true));
+        $publicStoragePath = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
+        // logger(print_r('ファイル保存先: ' . $publicStoragePath . $imageFileForWordcloud . ', URL -> ' . asset('storage/' . $imageFileForWordcloud), true));
 
         // twitterデータ取得
         $twitter_config = config('twitter');
@@ -143,7 +144,7 @@ class AnalysisRequestsController extends Controller
             '../../a6s-cloud-batch/src/createWordCloud.py',
             $localStoragePath . $tweetsFileForWordcloud,
             '../../RictyDiminished/RictyDiminished-Bold.ttf',
-            $localStoragePath . $imageFileForWordcloud
+            $publicStoragePath . $imageFileForWordcloud
         ]);
         // TODO: 出力したファイルをDB に保存する処理を追加する
         $process->run();
@@ -164,6 +165,7 @@ class AnalysisRequestsController extends Controller
         $aResult->tweet_count = $total_tweet;
         $aResult->favorite_count = $total_favorite;
         $aResult->retweet_count = $total_retweet;
+        $aResult->image = $imageFileForWordcloud;
         $aResult->save();
 
         // word cloudの画像を添付してツイートをする
