@@ -204,6 +204,7 @@ init_mysql_db() {
 
     docker-compose exec workspace runuser -l laradock -c '
         cd /var/www/a6s-cloud
+        [[ ! -L ./public/storage ]] && php artisan storage:link
         php artisan migrate:refresh
         php artisan db:seed
     '
