@@ -48,10 +48,6 @@ class TwitterClientService
             "total_tweet" => 0,
             "total_users_map" => array(),
         );
-        // $summary["total_retweet"] = 0;
-        // $summary["total_favorite"] = 0;
-        // $summary["total_tweet"] = 0;
-        // $summary["total_users_map"] = array();
 
         $searchTweet = $this->getSearchTweets($params);
         if(count($searchTweet->statuses) == 0){
@@ -59,7 +55,7 @@ class TwitterClientService
         }
 
         // 暫定的に最大10回のリクエストをする(1000件取得)
-        for ($i=0; $i<1; $i++) {
+        for ($i=0; $i<10; $i++) {
             foreach($searchTweet->statuses as $key => $value){
                 AnalysisRequestService::saveTweetParameters($id,$value);
 
@@ -87,5 +83,18 @@ class TwitterClientService
         }
 
         return $summary;
+    }
+
+    public function postTweet($publicStoragePath, $imageFileForWordcloud)
+    {
+        // word cloudの画像を添付してツイートをする
+        // ※動作確認する場合はコメントアウトを外してくだい
+        // TODO:投稿文言は要検討
+        // $media1 = $this->twitter_client->upload('media/upload', ['media' => $publicStoragePath . $imageFileForWordcloud]);
+        // $parameters = [
+        //     'status' => "つとむ、なおとリファクタリング中です！！\nテスト(池袋 いいオフィス)",
+        //     'media_ids' => implode(',', [$media1->media_id_string]),
+        // ];
+        // $result = $this->twitter_client->post('statuses/update', $parameters);
     }
 }

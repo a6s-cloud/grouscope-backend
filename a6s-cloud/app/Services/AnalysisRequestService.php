@@ -110,6 +110,16 @@ class AnalysisRequestService
         return $this->uuid . ".png";
     }
 
+    public function getLocalStoragePath()
+    {
+        return $this->localStoragePath;
+    }
+
+    public function getPublicStoragePath()
+    {
+        return $this->publicStoragePath;
+    }
+
     public function runWordCloud()
     {
         $process = new Process([

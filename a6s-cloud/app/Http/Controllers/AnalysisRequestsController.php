@@ -2,15 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use \DateTime;
-use \DateTimeZone;
-use App\AnalysisResults;
-use App\Tweets;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Abraham\TwitterOAuth\TwitterOAuth;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use AnalysisRequestService;
 use TwitterClientService;
@@ -19,6 +11,7 @@ class AnalysisRequestsController extends Controller
 {
     public function create(Request $request)
     {
+        // バリデーション処理
         $request->validate([
             'start_date' => 'required',
             'analysis_word' => 'required',
@@ -31,12 +24,13 @@ class AnalysisRequestsController extends Controller
         // AnalysisResultsテーブルにレコードを追加(解析開始ステータス)
         $id = AnalysisRequestService::saveStartParameters($params);
 
+        // tweetを取得して、統計情報を取得
         $localStorage = AnalysisRequestService::getLocalStorage();
         $tweetsFileForWordcloud = AnalysisRequestService::getTweetsFileForWordcloud();
         $summary = TwitterClientService::createTweetText($id, $params, $localStorage, $tweetsFileForWordcloud);
 
+        // Word Cloud処理を実行
         $process = AnalysisRequestService::runWordCloud();
-
         if (!$process->isSuccessful()) {
             AnalysisRequestService::saveErrorParameters();
 
@@ -47,26 +41,13 @@ class AnalysisRequestsController extends Controller
             return response($id, 500);
         }
 
-        // update処理
+        // ステータスの終了
         AnalysisRequestService::savefinishParameters($summary);
-        // $aResult->status = 2;
-        // $aResult->user_count = count($total_users_map);
-        // $aResult->favorite_count = $total_favorite;
-        // $aResult->tweet_count = $total_tweet;
-        // $aResult->favorite_count = $total_favorite;
-        // $aResult->retweet_count = $total_retweet;
-        // $aResult->image = $imageFileForWordcloud;
-        // $aResult->save();
 
-        // word cloudの画像を添付してツイートをする
-        // ※動作確認する場合はコメントアウトを外してくだい
-        // TODO:投稿文言は要検討
-        // $media1 = $this->twitter_client->upload('media/upload', ['media' => $localStoragePath . $imageFileForWordcloud]);
-        // $parameters = [
-        //     'status' => "実装テストちゅうです！！\nテスト",
-        //     'media_ids' => implode(',', [$media1->media_id_string]),
-        // ];
-        // $result = $this->twitter_client->post('statuses/update', $parameters);
+        // 結果のtweetを実行
+        $publicStoragePath = AnalysisRequestService::getPublicStoragePath();
+        $imageFileForWordcloud = AnalysisRequestService::getImageFileForWordcloud();
+        TwitterClientService::postTweet($publicStoragePath, $imageFileForWordcloud);
 
         // IDを取得を返す
         return response($id, 200);
