@@ -10,7 +10,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use \DateTime;
 use \DateTimeZone;
-
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class AnalysisRequestService
 {
@@ -62,6 +63,12 @@ class AnalysisRequestService
         return $this->aResult->id;
     }
 
+    public function saveErrorParameters()
+    {
+        $this->aResult->status = 3;
+        $this->aResult->save();
+    }
+
     public function saveTweetParameters($id, $value)
     {
         $tweet = new Tweets;
@@ -84,5 +91,23 @@ class AnalysisRequestService
     public function getTweetsFileForWordcloud()
     {
         return $this->uuid . ".txt";
+    }
+
+    public function getImageFileForWordcloud()
+    {
+        return $this->uuid . ".png";
+    }
+
+    public function runWordCloud()
+    {
+        $process = new Process([
+            'python3',
+            '../../a6s-cloud-batch/src/createWordCloud.py',
+            $this->localStoragePath . $this->getTweetsFileForWordcloud(),
+            '../../RictyDiminished/RictyDiminished-Bold.ttf',
+            $this->publicStoragePath . $this->getImageFileForWordcloud()
+        ]);
+        $process->run();
+        return $process;
     }
 }

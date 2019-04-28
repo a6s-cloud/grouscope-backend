@@ -35,39 +35,32 @@ class AnalysisRequestsController extends Controller
         $tweetsFileForWordcloud = AnalysisRequestService::getTweetsFileForWordcloud();
         TwitterClientService::createTweetText($id, $params, $localStorage, $tweetsFileForWordcloud);
 
-        return response("0k",200);
-
-        // logger(print_r('Total user num -> ' . count($total_users_map) , true));
-        $aResult->user_count = count($total_users_map);
-        $aResult->save();
-
         // wordcloudを実行
+        // $process = new Process([
+        //     'python3',
+        //     '../../a6s-cloud-batch/src/createWordCloud.py',
+        //     $localStoragePath . $tweetsFileForWordcloud,
+        //     '../../RictyDiminished/RictyDiminished-Bold.ttf',
+        //     $publicStoragePath . $imageFileForWordcloud
+        // ]);
+        // // TODO: 出力したファイルをDB に保存する処理を追加する
+        // $process->run();
 
-        // logger(print_r('python3 ../../a6s-cloud-batch/src/createWordCloud.py '
-        //     . $localStoragePath . $tweetsFileForWordcloud
-        //     . '../../RictyDiminished/RictyDiminished-Bold.ttf /var/www/result.png', true));
-        $process = new Process([
-            'python3',
-            '../../a6s-cloud-batch/src/createWordCloud.py',
-            $localStoragePath . $tweetsFileForWordcloud,
-            '../../RictyDiminished/RictyDiminished-Bold.ttf',
-            $publicStoragePath . $imageFileForWordcloud
-        ]);
-        // TODO: 出力したファイルをDB に保存する処理を追加する
-        $process->run();
+        $process = AnalysisRequestService::runWordCloud();
+
         if (!$process->isSuccessful()) {
-            $aResult->status = 3;
-            $aResult->save();
+            AnalysisRequestService::saveErrorParameters();
 
             $e = new ProcessFailedException($process);
             logger(print_r($e->getMessage(), true));
             logger(print_r($e->getTraceAsString(), true));
 
-            return response($aResult->id, 500);
+            return response($id, 500);
         }
 
         // update処理
         $aResult->status = 2;
+        $aResult->user_count = count($total_users_map);
         $aResult->favorite_count = $total_favorite;
         $aResult->tweet_count = $total_tweet;
         $aResult->favorite_count = $total_favorite;
