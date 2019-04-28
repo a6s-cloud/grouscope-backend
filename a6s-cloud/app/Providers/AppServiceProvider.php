@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Services\AnalysisRequestService;
+use App\Services\TwitterClientService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,6 +17,7 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         $this->app->bind('AnalysisRequestService', AnalysisRequestService::class);
+        $this->app->bind('TwitterClientService', TwitterClientService::class);
     }
 
     /**

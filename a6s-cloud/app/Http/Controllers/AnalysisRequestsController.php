@@ -13,6 +13,7 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use AnalysisRequestService;
+use TwitterClientService;
 
 class AnalysisRequestsController extends Controller
 {
