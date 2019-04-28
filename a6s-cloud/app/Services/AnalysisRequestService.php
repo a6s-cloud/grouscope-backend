@@ -5,6 +5,12 @@ namespace App\Services;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\AnalysisResults;
+use App\Tweets;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use \DateTime;
+use \DateTimeZone;
+
 
 class AnalysisRequestService
 {
@@ -18,10 +24,10 @@ class AnalysisRequestService
     public function __construct()
     {
         $this->aResult = new AnalysisResults;
-        $this->$uuid = (string) str::uuid();
-        $this->$localStorage = Storage::disk('local');
-        $this->$localStoragePath = $localStorage->getDriver()->getAdapter()->getPathPrefix();
-        $this->$publicStoragePath = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
+        $this->uuid = (string) str::uuid();
+        $this->localStorage = Storage::disk('local');
+        $this->localStoragePath = $this->localStorage->getDriver()->getAdapter()->getPathPrefix();
+        $this->publicStoragePath = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
     }
 
     public function getRequestParameters(Request $request)
@@ -54,5 +60,29 @@ class AnalysisRequestService
         $this->aResult->status = 1;
         $this->aResult->save();
         return $this->aResult->id;
+    }
+
+    public function saveTweetParameters($id, $value)
+    {
+        $tweet = new Tweets;
+        $tweet->analysis_result_id = $id;
+        $tweet->user_name = $value->user->name;
+        $tweet->user_account = $value->user->screen_name;
+        $tweet->text = $value->text;
+        $tweet->retweet_count = $value->retweet_count;
+        $tweet->favorite_count = $value->favorite_count;
+        $tweet->created_at = (new DateTime($value->created_at))
+                                 ->setTimeZone(new DateTimeZone('Asia/Tokyo'))->format("Y/m/d H:i:s");
+        $tweet->save();
+    }
+
+    public function getLocalStorage()
+    {
+        return $this->localStorage;
+    }
+
+    public function getTweetsFileForWordcloud()
+    {
+        return $this->uuid . ".txt";
     }
 }
