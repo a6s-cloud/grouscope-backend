@@ -33,18 +33,7 @@ class AnalysisRequestsController extends Controller
 
         $localStorage = AnalysisRequestService::getLocalStorage();
         $tweetsFileForWordcloud = AnalysisRequestService::getTweetsFileForWordcloud();
-        TwitterClientService::createTweetText($id, $params, $localStorage, $tweetsFileForWordcloud);
-
-        // wordcloudを実行
-        // $process = new Process([
-        //     'python3',
-        //     '../../a6s-cloud-batch/src/createWordCloud.py',
-        //     $localStoragePath . $tweetsFileForWordcloud,
-        //     '../../RictyDiminished/RictyDiminished-Bold.ttf',
-        //     $publicStoragePath . $imageFileForWordcloud
-        // ]);
-        // // TODO: 出力したファイルをDB に保存する処理を追加する
-        // $process->run();
+        $summary = TwitterClientService::createTweetText($id, $params, $localStorage, $tweetsFileForWordcloud);
 
         $process = AnalysisRequestService::runWordCloud();
 
@@ -59,14 +48,15 @@ class AnalysisRequestsController extends Controller
         }
 
         // update処理
-        $aResult->status = 2;
-        $aResult->user_count = count($total_users_map);
-        $aResult->favorite_count = $total_favorite;
-        $aResult->tweet_count = $total_tweet;
-        $aResult->favorite_count = $total_favorite;
-        $aResult->retweet_count = $total_retweet;
-        $aResult->image = $imageFileForWordcloud;
-        $aResult->save();
+        AnalysisRequestService::savefinishParameters($summary);
+        // $aResult->status = 2;
+        // $aResult->user_count = count($total_users_map);
+        // $aResult->favorite_count = $total_favorite;
+        // $aResult->tweet_count = $total_tweet;
+        // $aResult->favorite_count = $total_favorite;
+        // $aResult->retweet_count = $total_retweet;
+        // $aResult->image = $imageFileForWordcloud;
+        // $aResult->save();
 
         // word cloudの画像を添付してツイートをする
         // ※動作確認する場合はコメントアウトを外してくだい
@@ -79,6 +69,6 @@ class AnalysisRequestsController extends Controller
         // $result = $this->twitter_client->post('statuses/update', $parameters);
 
         // IDを取得を返す
-        return response($aResult->id, 200);
+        return response($id, 200);
     }
 }

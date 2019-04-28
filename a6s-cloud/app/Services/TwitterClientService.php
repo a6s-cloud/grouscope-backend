@@ -42,10 +42,16 @@ class TwitterClientService
     public function createTweetText($id, $params, $localStorage, $tweetsFileForWordcloud)
     {
         // サマリ件数を計算
-        $total_retweet = 0;
-        $total_favorite = 0;
-        $total_tweet = 0;
-        $total_users_map = array();
+        $summary = array(
+            "total_retweet" => 0,
+            "total_favorite" => 0,
+            "total_tweet" => 0,
+            "total_users_map" => array(),
+        );
+        // $summary["total_retweet"] = 0;
+        // $summary["total_favorite"] = 0;
+        // $summary["total_tweet"] = 0;
+        // $summary["total_users_map"] = array();
 
         $searchTweet = $this->getSearchTweets($params);
         if(count($searchTweet->statuses) == 0){
@@ -58,12 +64,12 @@ class TwitterClientService
                 AnalysisRequestService::saveTweetParameters($id,$value);
 
                 // ユーザ数カウント用のキーを登録
-                $total_users_map[$value->user->screen_name] = null;
+                $summary["total_users_map"][$value->user->screen_name] = null;
 
                 // サマリを計算
-                $total_retweet = $total_retweet + $value->retweet_count;
-                $total_favorite = $total_favorite + $value->favorite_count;
-                $total_tweet = $total_tweet + 1;
+                $summary["total_retweet"] = $summary["total_retweet"] + $value->retweet_count;
+                $summary["total_favorite"] = $summary["total_favorite"] + $value->favorite_count;
+                $summary["total_tweet"] = $summary["total_tweet"] + 1;
 
                 // wordcloud用のテキストファイルにtweet データを保存
                 $localStorage->append($tweetsFileForWordcloud, $value->text);
@@ -79,5 +85,7 @@ class TwitterClientService
                 break;
             }
         }
+
+        return $summary;
     }
 }

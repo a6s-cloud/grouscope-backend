@@ -69,6 +69,18 @@ class AnalysisRequestService
         $this->aResult->save();
     }
 
+    public function savefinishParameters($summary)
+    {
+        $this->aResult->status = 2;
+        $this->aResult->user_count = count($summary["total_users_map"]);
+        $this->aResult->favorite_count = $summary["total_favorite"];
+        $this->aResult->tweet_count = $summary["total_tweet"];
+        $this->aResult->favorite_count = $summary["total_favorite"];
+        $this->aResult->retweet_count = $summary["total_retweet"];
+        $this->aResult->image = $this->getImageFileForWordcloud();
+        $this->aResult->save();
+    }
+
     public function saveTweetParameters($id, $value)
     {
         $tweet = new Tweets;
