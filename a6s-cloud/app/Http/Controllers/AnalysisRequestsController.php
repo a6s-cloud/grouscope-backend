@@ -26,18 +26,20 @@ class AnalysisRequestsController extends Controller
 
         // パラメータを取得
         $params = AnalysisRequestService::getRequestParameters($request);
+
+        // AnalysisResultsテーブルにレコードを追加(解析開始ステータス)
         $id = AnalysisRequestService::saveStartParameters($params);
         return response($id, 200);
 
         // wordcloud 解析用のファイルpath を作成する
         // TODO: uuid をつかって一意なファイル名を作成するようにしているが、念の為そのファイルが既に作成されていないかチェックすべき
         // TODO: a6s-cloud-batch 処理成功後にこのファイルを削除する処理を追加すべき
-        $uuid = (string) str::uuid();
-        $tweetsFileForWordcloud = $uuid . ".txt";
-        $imageFileForWordcloud = $uuid . ".png";
-        $localStorage = Storage::disk('local');
-        $localStoragePath = $localStorage->getDriver()->getAdapter()->getPathPrefix();
-        $publicStoragePath = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
+        // $uuid = (string) str::uuid();
+        // $tweetsFileForWordcloud = $uuid . ".txt";
+        // $imageFileForWordcloud = $uuid . ".png";
+        // $localStorage = Storage::disk('local');
+        // $localStoragePath = $localStorage->getDriver()->getAdapter()->getPathPrefix();
+        // $publicStoragePath = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
         // logger(print_r('ファイル保存先: ' . $publicStoragePath . $imageFileForWordcloud . ', URL -> ' . asset('storage/' . $imageFileForWordcloud), true));
 
         // twitterデータ取得

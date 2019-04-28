@@ -9,11 +9,19 @@ use App\AnalysisResults;
 class AnalysisRequestService
 {
     private $aResult;
+    private $uuid;
+    private $localStorage;
+    private $localStoragePath;
+    private $publicStoragePath;
 
     // コンストラクタ
     public function __construct()
     {
         $this->aResult = new AnalysisResults;
+        $this->$uuid = (string) str::uuid();
+        $this->$localStorage = Storage::disk('local');
+        $this->$localStoragePath = $localStorage->getDriver()->getAdapter()->getPathPrefix();
+        $this->$publicStoragePath = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
     }
 
     public function getRequestParameters(Request $request)
