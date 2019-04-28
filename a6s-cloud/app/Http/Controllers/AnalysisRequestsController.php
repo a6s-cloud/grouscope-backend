@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Abraham\TwitterOAuth\TwitterOAuth;
-use Carbon\Carbon;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use AnalysisRequestService;
@@ -26,24 +25,9 @@ class AnalysisRequestsController extends Controller
         ]);
 
         // パラメータを取得
-        $start_date = $request->input('start_date');
-        $analysis_word = $request->input('analysis_word');
-        $url = $request->input('url');
-        $analysis_timing = $request->input('analysis_timing');
-
-        // 抽出日付形式をハイフンに変換
-        $carbon = new Carbon($start_date);
-        $target_start_date = $carbon->format('Y-m-d_00:00:00');
-        $target_end_date = $carbon->format('Y-m-d_23:59:59');
-
-        // analysis_resultsにデータを保存
-        $aResult = new AnalysisResults;
-        $aResult->analysis_start_date = $target_start_date;
-        $aResult->analysis_end_date = $target_end_date;
-        $aResult->analysis_word = $analysis_word;
-        $aResult->url = $url;
-        $aResult->status = 1;
-        $aResult->save();
+        $params = AnalysisRequestService::getRequestParameters($request);
+        $id = AnalysisRequestService::saveStartParameters($params);
+        return response($id, 200);
 
         // wordcloud 解析用のファイルpath を作成する
         // TODO: uuid をつかって一意なファイル名を作成するようにしているが、念の為そのファイルが既に作成されていないかチェックすべき
@@ -67,11 +51,13 @@ class AnalysisRequestsController extends Controller
 
 
         // twitter serch
-        $params = ['q'=> $analysis_word,
+        // 抽出日付形式をハイフンに変換
+        $format_date = AnalysisRequestService::formatDate($params["start_date"]);
+        $params = ['q'=> $params["analysis_word"],
                    'count'=> 100,
                    'result_type'=>'recent',
-                   'since'=> $target_start_date.'_JST',
-                   'until'=> $target_end_date.'_JST',
+                   'since'=> $format_date["target_start_date"].'_JST',
+                   'until'=> $format_date["target_end_date"].'_JST',
                   ];
         $searchTweet = $this->twitter_client->get("search/tweets", $params);
         // ツイートデータを確認
@@ -178,7 +164,6 @@ class AnalysisRequestsController extends Controller
         // $result = $this->twitter_client->post('statuses/update', $parameters);
 
         // IDを取得を返す
-        // return response($aResult->id, 200);
-        return response(AnalysisRequestService::exampleFunc(), 200);
+        return response($aResult->id, 200);
     }
 }
