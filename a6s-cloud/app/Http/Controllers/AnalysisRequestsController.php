@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use \DateTime;
 use \DateTimeZone;
-
 use App\AnalysisResults;
 use App\Tweets;
 use Illuminate\Http\Request;
@@ -12,9 +11,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Carbon\Carbon;
-
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use AnalysisRequestService;
 
 class AnalysisRequestsController extends Controller
 {
@@ -85,7 +84,7 @@ class AnalysisRequestsController extends Controller
         $total_users_map = array();
 
         // 暫定的に最大10回のリクエストをする(1000件取得)
-        for ($i=0; $i<10; $i++) {
+        for ($i=0; $i<1; $i++) {
             foreach($searchTweet->statuses as $key => $value){
                 $tweet = new Tweets;
                 $tweet->analysis_result_id = $aResult->id;
@@ -179,6 +178,7 @@ class AnalysisRequestsController extends Controller
         // $result = $this->twitter_client->post('statuses/update', $parameters);
 
         // IDを取得を返す
-        return response($aResult->id, 200);
+        // return response($aResult->id, 200);
+        return response(AnalysisRequestService::exampleFunc(), 200);
     }
 }
