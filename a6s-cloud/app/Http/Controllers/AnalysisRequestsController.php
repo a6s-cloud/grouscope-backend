@@ -11,6 +11,11 @@ class AnalysisRequestsController extends Controller
 {
     public function create(Request $request)
     {
+
+        $value_of_consumer_key = env('CONSUMER_KEY','default_value');
+        logger(print_r($value_of_consumer_key, true));
+        return response("OK", 200);
+
         // バリデーション処理
         $request->validate([
             'start_date' => 'required',
