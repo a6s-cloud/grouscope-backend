@@ -63,8 +63,11 @@ class TwitterClientService
                 $summary["total_users_map"][$value->user->screen_name] = null;
 
                 // サマリを計算
-                $summary["total_retweet"] = $summary["total_retweet"] + $value->retweet_count;
-                $summary["total_favorite"] = $summary["total_favorite"] + $value->favorite_count;
+                if(substr($value->text, 0, 2) !== "RT"){
+                    // RT以外のみ「いいね」、「リツート」を加算する
+                    $summary["total_retweet"] = $summary["total_retweet"] + $value->retweet_count;
+                    $summary["total_favorite"] = $summary["total_favorite"] + $value->favorite_count;
+                }
                 $summary["total_tweet"] = $summary["total_tweet"] + 1;
 
                 // wordcloud用のテキストファイルにtweet データを保存
