@@ -130,6 +130,8 @@ class AnalysisRequestService
             $this->publicStoragePath . $this->getImageFileForWordcloud()
         ]);
         $process->run();
+
+        $this->localStorage->delete($this->getTweetsFileForWordcloud());
         return $process;
     }
 }
