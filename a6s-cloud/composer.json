@@ -64,7 +64,7 @@
             "echo \"$DB_HOST\" >&2; true",
             "php artisan migrate",
             "rm -rf ./public/storage",
-            "php artisan storage:link",
+            "ln -s ../storage/app/public ./public/storage",
             "echo 'test' > storage/app/public/test.txt",
             "rm -rf a6s_modules/a6s-cloud-batch && git clone --depth 1 https://github.com/nsuzuki7713/a6s-cloud-batch.git a6s_modules/a6s-cloud-batch",
             "rm -rf a6s_modules/RictyDiminished && git clone --depth 1 https://github.com/edihbrandon/RictyDiminished.git a6s_modules/RictyDiminished"
