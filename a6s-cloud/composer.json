@@ -62,8 +62,7 @@
         ],
         "post-install-cmd": [
             "echo \"$DB_HOST\" >&2; true",
-            "@php artisan migrate",
-            "@php artisan db:seed"
+            "@php artisan migrate"
         ],
         "post-update-cmd": [
             "@php artisan migrate"
