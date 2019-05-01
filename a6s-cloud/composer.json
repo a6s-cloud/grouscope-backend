@@ -61,6 +61,7 @@
             "@php artisan key:generate --ansi"
         ],
         "post-install-cmd": [
+            "echo \"$DB_HOST\" >&2; true",
             "@php artisan migrate",
             "@php artisan db:seed"
         ],
