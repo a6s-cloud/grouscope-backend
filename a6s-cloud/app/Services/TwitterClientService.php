@@ -57,7 +57,8 @@ class TwitterClientService
         // 暫定的に最大10回のリクエストをする(1000件取得)
         for ($i=0; $i<1; $i++) {
             foreach($searchTweet->statuses as $key => $value){
-                AnalysisRequestService::saveTweetParameters($id,$value);
+                // TODO: heroku タイムアウト防止のため一旦tweet 保存処理をスキップする
+                // AnalysisRequestService::saveTweetParameters($id,$value);
 
                 // ユーザ数カウント用のキーを登録
                 $summary["total_users_map"][$value->user->screen_name] = null;

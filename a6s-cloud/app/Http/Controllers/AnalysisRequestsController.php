@@ -11,12 +11,6 @@ class AnalysisRequestsController extends Controller
 {
     public function create(Request $request)
     {
-
-        $value_of_consumer_key = env('CONSUMER_KEY','(not set)');
-        $value_of_db_username  = env('DB_USERNAME','(not set)');
-        error_log(print_r('Tweeter info: CONSUMER_KEY=' . $value_of_consumer_key . ', CONSUMER_SECRET=*, ACCESS_TOKEN=*, ACCESS_TOKEN_SECRET=*', true));
-        error_log(print_r('DB      info: DB_USERNAME=' . $value_of_db_username . ', DB_PASSWORD=*, DB_HOST=*, DB_DATABASE=*', true));
-
         // バリデーション処理
         $request->validate([
             'start_date' => 'required',
