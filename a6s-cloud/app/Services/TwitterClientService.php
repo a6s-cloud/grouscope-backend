@@ -39,6 +39,12 @@ class TwitterClientService
         return $searchTweet;
     }
 
+    // 最終リクエストのx_rate_limit_remainingを取得
+    private function getLimitRemaining()
+    {
+        return $this->twitter_client->getLastXHeaders()["x_rate_limit_remaining"];
+    }
+
     public function createTweetText($id, $params, $localStorage, $tweetsFileForWordcloud)
     {
         // サマリ件数を計算
@@ -50,8 +56,10 @@ class TwitterClientService
         );
 
         $searchTweet = $this->getSearchTweets($params);
-        if(count($searchTweet->statuses) == 0){
-            return;
+
+        // 0件もしくは、APIのカウントがない場合は終了
+        if(count($searchTweet->statuses) == 0 || $this->getLimitRemaining() == 0){
+            return $summary;
         }
 
         // 暫定的に最大10回のリクエストをする(1000件取得)
@@ -79,8 +87,8 @@ class TwitterClientService
             // 次のツイートデータを取得
             $searchTweet = $this->getSearchTweets($params);
 
-            // 0件なら終了
-            if(count($searchTweet->statuses) == 0){
+            // 0件もしくは、APIのカウントがない場合は終了
+            if(count($searchTweet->statuses) == 0 || $this->getLimitRemaining() == 0){
                 break;
             }
         }
