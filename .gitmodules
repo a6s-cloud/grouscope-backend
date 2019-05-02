@@ -8,4 +8,4 @@
 	ignore = dirty
 [submodule "a6s-cloud-batch"]
 	path = a6s-cloud-batch
-	url = git@github.com:nsuzuki7713/a6s-cloud-batch.git
+	url = https://github.com/nsuzuki7713/a6s-cloud-batch.git
