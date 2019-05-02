@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3e24f659c494fac64daa37227527a859",
+    "content-hash": "c2763ed912f9cd9089d365ed40090256",
     "packages": [
         {
             "name": "abraham/twitteroauth",
@@ -650,6 +650,33 @@
                 "trusted proxy"
             ],
             "time": "2019-01-10T14:06:47+00:00"
+        },
+        {
+            "name": "grohiro/laravel-camelcase-json",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/grohiro/laravel-camelcase-json.git",
+                "reference": "9659d3c418c835864648f3ba1c2c42d2769a543c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/grohiro/laravel-camelcase-json/zipball/9659d3c418c835864648f3ba1c2c42d2769a543c",
+                "reference": "9659d3c418c835864648f3ba1c2c42d2769a543c",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Grohiro\\LaravelCamelCaseJson\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Convert response JSON key to camelCase",
+            "time": "2017-12-11T14:07:52+00:00"
         },
         {
             "name": "jakub-onderka/php-console-color",
