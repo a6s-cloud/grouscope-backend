@@ -62,8 +62,8 @@ class TwitterClientService
             return $summary;
         }
 
-        // 暫定的に最大10回のリクエストをする(1000件取得)
-        for ($i=0; $i<10; $i++) {
+        // 暫定的に最大50回のリクエストをする(5000件取得)
+        for ($i=0; $i<50; $i++) {
             foreach($searchTweet->statuses as $key => $value){
                 AnalysisRequestService::saveTweetParameters($id,$value);
 
