@@ -227,6 +227,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'AnalysisRequestService' => App\Facades\AnalysisRequestService::class,
         'TwitterClientService' => App\Facades\TwitterClientService::class,
+        'ScrapingService' => App\Facades\ScrapingService::class,
     ],
 
 ];
