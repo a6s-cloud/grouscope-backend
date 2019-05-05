@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use AnalysisRequestService;
 use TwitterClientService;
-use App\Rules\NonFrequencyAnalysisRequest;
+use App\Rules\NonDuplicateAnalysisRequest;
 
 class AnalysisRequestsController extends Controller
 {
@@ -15,7 +15,7 @@ class AnalysisRequestsController extends Controller
         // バリデーション処理
         $request->validate([
             'start_date' => 'required',
-            'analysis_word' => ['required', new NonFrequencyAnalysisRequest($request)],
+            'analysis_word' => ['required', new NonDuplicateAnalysisRequest($request)],
             'analysis_timing' => 'required'
         ]);
 
