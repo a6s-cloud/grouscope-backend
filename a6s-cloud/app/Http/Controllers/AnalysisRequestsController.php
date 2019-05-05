@@ -15,12 +15,9 @@ class AnalysisRequestsController extends Controller
         // バリデーション処理
         $request->validate([
             'start_date' => 'required',
-            'analysis_word' => ['required', new NonFrequencyAnalysisRequest],
+            'analysis_word' => ['required', new NonFrequencyAnalysisRequest($request)],
             'analysis_timing' => 'required'
         ]);
-
-        // TODO: test
-        return response(0, 200);
 
         // パラメータを取得
         $params = AnalysisRequestService::getRequestParameters($request);
