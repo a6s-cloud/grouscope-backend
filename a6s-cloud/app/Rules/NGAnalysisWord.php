@@ -3,6 +3,7 @@
 namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
+use App\BlackAnalysisWords;
 
 class NGAnalysisWord implements Rule
 {
@@ -25,7 +26,7 @@ class NGAnalysisWord implements Rule
      */
     public function passes($attribute, $value)
     {
-        return true
+        return !BlackAnalysisWords::where('analysis_ng_word', '=', $value)->exists();
     }
 
     /**
