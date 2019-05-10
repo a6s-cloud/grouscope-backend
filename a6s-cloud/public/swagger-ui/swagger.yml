@@ -106,3 +106,40 @@ paths:
                 type: "integer"
                 example: "0"
                 description: "削除フラグ"
+  /AnalysisRequests:
+    post:
+      summary: "解析依頼のAPI"
+      description: "検索ワードで解析を行います"
+      tags:
+        - AnalysisRequests
+      parameters:
+      - name: "startDate"
+        in: "query"
+        description: "解析日付:2019/05/10"
+        required: true
+        type: "string"
+      - name: "analysisWord"
+        in: "query"
+        description: "解析ワード:#運用ちゃんデプロイイベント"
+        required: true
+        type: "string"
+      - name: "url"
+        in: "query"
+        description: "勉強会URL:aaa.co.jp"
+        type: "string"
+      - name: "analysisTiming"
+        in: "query"
+        description: "解析タイミング:[1,2]"
+        required: true
+        type: "string"
+      - name: "autoTweet"
+        in: "query"
+        description: "自動ツイート:true"
+        type: "string"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          schema:
+            type: "string"
+            example: 1
+            description: "解析結果ID"
