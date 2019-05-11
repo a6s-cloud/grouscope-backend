@@ -96,6 +96,7 @@ build() {
             echo "ERROR: /var/www/a6s-cloud ディレクトリがありません。Laravel プロジェクトの作成に失敗しました。" >&2
             exit 1
         fi
+        echo "* * * * * laradock /usr/bin/php /var/www/a6s-cloud/artisan schedule:run >> /dev/null 2>&1" > /etc/cron.d/laradock
     '
 
     docker-compose exec workspace runuser -l laradock -c '
