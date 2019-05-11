@@ -200,15 +200,6 @@ init_mysql_db() {
         php artisan db:seed
     '
 
-    # docker-compose exec mysql bash -c '
-    #     set -e
-    #     DB_PW_ROOT="root"
-    #     DB_NAME="a6s_cloud"
-
-    #     echo "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
-    #     MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
-    # '
-
     docker-compose exec workspace bash -c '
         # cd /var/www/a6s-cloud
         # [[ ! -L ./public/storage ]] && php artisan storage:link
