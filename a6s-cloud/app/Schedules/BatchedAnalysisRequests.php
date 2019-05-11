@@ -1,9 +1,11 @@
 <?php
 namespace App\Schedules;
 
+use Carbon\Carbon;
 use AnalysisRequestService;
 use TwitterClientService;
 use App\AnalysisResults;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class BatchedAnalysisRequests
 {
@@ -22,20 +24,40 @@ class BatchedAnalysisRequests
                     . $job->analysis_word . ', analysis_start_date: '
                     . $job->analysis_start_date . ', analysis_end_date: ' . $job->analysis_end_date . ']', true));
 
-            $job->status = 0;       // TODO: 1
+            AnalysisRequestService::setAResult($job);
+
+            // ステータスを実行中に変更する
+            $job->status = 1;       // TODO: 1
             $job->save();
 
+            // Tweet 保存用ファイルを定義する
             $localStorage = AnalysisRequestService::getLocalStorage();
             $tweetsFileForWordcloud = AnalysisRequestService::getTweetsFileForWordcloud();
 
-            $params = array(
-                'start_date' => '2019-05-11',
-                'analysis_word' => '#Google'
+            // Tweet 取得用のパラメータを構築する
+            $start_date_for_twitter = (new Carbon($job->start_date))->format('Y-m-d');
+            $params_for_twitter = array(
+                'start_date' => $start_date_for_twitter,
+                'analysis_word' => $job->analysis_word
             );
-            $summary = TwitterClientService::createTweetText($job->id, $params, $localStorage, $tweetsFileForWordcloud);
+
+            $summary = TwitterClientService::createTweetText($job->id, $params_for_twitter, $localStorage, $tweetsFileForWordcloud);
+
+            $process = AnalysisRequestService::runWordCloud();
+            if (!$process->isSuccessful()) {
+                logger(print_r('Failed: ' . $job->analysis_word, true));
+                AnalysisRequestService::saveErrorParameters();
+
+                $e = new ProcessFailedException($process);
+                logger(print_r($e->getMessage(), true));
+                logger(print_r($e->getTraceAsString(), true));
+
+                continue;
+            }
+            AnalysisRequestService::savefinishParameters($summary);
         }
 
-        logger(print_r('解析依頼バッチ開始', true));
+        logger(print_r('解析依頼バッチ終了', true));
     }
 }
 

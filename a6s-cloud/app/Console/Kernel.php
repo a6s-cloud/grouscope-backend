@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(new BatchedAnalysisRequests)->everyMinute();
+        $schedule->call(new BatchedAnalysisRequests)->everyTenMinutes();
     }
 
     /**
