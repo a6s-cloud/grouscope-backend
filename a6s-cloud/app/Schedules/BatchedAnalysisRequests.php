@@ -13,7 +13,8 @@ class BatchedAnalysisRequests
     {
         logger(print_r('解析依頼バッチ開始', true));
 
-        $jobs = AnalysisResults::where('status', '=', '0')->get();
+        $today = Carbon::today()->format('Y-m-d 00:00:00');
+        $jobs = AnalysisResults::where('status', '=', '0')->where('analysis_start_date', '<', $today)->get();
         if (count($jobs) === 0) {
             logger(print_r('バッチ処理すべき解析依頼がありません(0件)', true));
             return;
@@ -35,7 +36,7 @@ class BatchedAnalysisRequests
             $tweetsFileForWordcloud = AnalysisRequestService::getTweetsFileForWordcloud();
 
             // Tweet 取得用のパラメータを構築する
-            $start_date_for_twitter = (new Carbon($job->start_date))->format('Y-m-d');
+            $start_date_for_twitter = (new Carbon($job->analysis_start_date))->format('Y-m-d');
             $params_for_twitter = array(
                 'start_date' => $start_date_for_twitter,
                 'analysis_word' => $job->analysis_word
