@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Schedules\BatchedAnalysisRequests;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,9 +25,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function() {
-            logger(print_r('Hello Laravel Schedule!!', true));
-        })->everyMinute();
+        $schedule->call(new BatchedAnalysisRequests)->everyMinute();
     }
 
     /**
