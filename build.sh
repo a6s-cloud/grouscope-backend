@@ -96,6 +96,7 @@ build() {
             echo "ERROR: /var/www/a6s-cloud ディレクトリがありません。Laravel プロジェクトの作成に失敗しました。" >&2
             exit 1
         fi
+        echo "* * * * * laradock /usr/bin/php /var/www/a6s-cloud/artisan schedule:run >> /dev/null 2>&1" > /etc/cron.d/laradock
     '
 
     docker-compose exec workspace runuser -l laradock -c '
@@ -152,6 +153,8 @@ init_mysql_db() {
         echo ">>> sql: ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
         MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "ALTER USER '"'"'default'"'"'@'"'"'%'"'"' IDENTIFIED WITH mysql_native_password BY '"'"'secret'"'"';"
         # MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "SELECT user, host, plugin FROM mysql.user;" | grep -E "^default"
+        echo "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
+        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
     '
     docker-compose exec php-fpm bash -c '
         set -e
@@ -191,22 +194,35 @@ init_mysql_db() {
         sync
         echo "NOTICE: プロジェクトのDB 接続先を設定しました"
         grep -E "(^DB_HOST|^DB_DATABASE|^DB_USERNAME)"              .env
-    '
 
-    docker-compose exec mysql bash -c '
-        set -e
-        DB_PW_ROOT="root"
-        DB_NAME="a6s_cloud"
-
-        echo "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
-        MYSQL_PWD="${DB_PW_ROOT}" mysql -u root <<< "GRANT ALL ON ${DB_NAME}.* TO '"'"'default'"'"'@'"'"'%'"'"';"
-    '
-
-    docker-compose exec workspace runuser -l laradock -c '
-        cd /var/www/a6s-cloud
         [[ ! -L ./public/storage ]] && php artisan storage:link
         php artisan migrate:refresh
         php artisan db:seed
+    '
+
+    docker-compose exec workspace bash -c '
+        # cd /var/www/a6s-cloud
+        # [[ ! -L ./public/storage ]] && php artisan storage:link
+        # php artisan migrate:refresh
+        # php artisan db:seed
+
+        # python3 環境の構築
+        pkg_cache=$(apt list --installed 2> /dev/null | grep -v -E "Listing..." | cut -d "/" -f 1)
+        declare -a target=("python3" "python3\-pip")
+        for (( i = 0; i < ${#target[@]}; ++i )) {
+            p="${target[i]}"
+
+            if ! (grep -E "^${p}$" &> /dev/null <<< "$pkg_cache"); then
+                echo "python3, python3-pip をインストールします"
+                apt-get update
+                DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends python3 python3-pip
+                break
+            fi
+        }
+
+        for pipackage in matplotlib janome wordcloud; do
+            pip3 --disable-pip-version-check install "$pipackage"
+        done
     '
 }
 

@@ -31,6 +31,10 @@ class AnalysisRequestService
         $this->publicStoragePath = Storage::disk('public')->getDriver()->getAdapter()->getPathPrefix();
     }
 
+    public function setAResult($result) {
+        $this->aResult = $result;
+    }
+
     public function getRequestParameters(Request $request)
     {
         return array(
@@ -124,9 +128,9 @@ class AnalysisRequestService
     {
         $process = new Process([
             'python3',
-            '../../a6s-cloud-batch/src/createWordCloud.py',
+            base_path() . '/../a6s-cloud-batch/src/createWordCloud.py',
             $this->localStoragePath . $this->getTweetsFileForWordcloud(),
-            '../../RictyDiminished/RictyDiminished-Bold.ttf',
+            base_path() . '/../RictyDiminished/RictyDiminished-Bold.ttf',
             $this->publicStoragePath . $this->getImageFileForWordcloud()
         ]);
         $process->run();
