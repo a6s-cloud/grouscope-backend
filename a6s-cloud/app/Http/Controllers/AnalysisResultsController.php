@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\AnalysisResults;
+use App\Tweets;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -25,5 +25,13 @@ class AnalysisResultsController extends Controller
 
         $results['user_ranking'] = $tweet_users;
         return \Response::json($results);
+    }
+    public function delete($id)
+    {
+        $tweets_query = Tweets::query();
+        $tweets_query->where('analysis_result_id', '=', $id)->delete();
+
+        AnalysisResults::find($id)->delete();
+        return 204;
     }
 }

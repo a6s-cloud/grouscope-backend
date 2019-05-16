@@ -20,3 +20,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('v1/AnalysisResultLists', 'AnalysisResultListsController@index');
 Route::post('v1/AnalysisRequests', 'AnalysisRequestsController@create');
 Route::get('v1/AnalysisResults/{id}', 'AnalysisResultsController@show');
+Route::delete('v1/AnalysisResults/{id}', 'AnalysisResultsController@delete');
