@@ -41,12 +41,13 @@ class AnalysisRequestsController extends Controller
             logger(print_r($e->getMessage(), true));
             logger(print_r($e->getTraceAsString(), true));
 
-            SlackFile::upload([
-                'filename' => 'wordCloudError.txt',
-                'content' => $e->getMessage().$e->getTraceAsString(),
-                'channels' => '#grouscope_applog',
-                'initial_comment' => 'WordCloudの処理でエラーがでたよー:sob:'
-            ]);
+            // 開発時に出力しないためにコメントアウト
+            // SlackFile::upload([
+            //     'filename' => 'wordCloudError.txt',
+            //     'content' => $e->getMessage().$e->getTraceAsString(),
+            //     'channels' => '#grouscope_applog',
+            //     'initial_comment' => 'WordCloudの処理でエラーがでたよー:sob:'
+            // ]);
             return response($id, 500);
         }
 
