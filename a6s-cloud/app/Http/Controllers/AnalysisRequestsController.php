@@ -8,6 +8,7 @@ use AnalysisRequestService;
 use TwitterClientService;
 use App\Rules\NonDuplicateAnalysisRequest;
 use App\Rules\NGAnalysisWord;
+use SlackFile;
 
 class AnalysisRequestsController extends Controller
 {
@@ -40,6 +41,13 @@ class AnalysisRequestsController extends Controller
             logger(print_r($e->getMessage(), true));
             logger(print_r($e->getTraceAsString(), true));
 
+            // 開発時に出力しないためにコメントアウト
+            // SlackFile::upload([
+            //     'filename' => 'wordCloudError.txt',
+            //     'content' => $e->getMessage().$e->getTraceAsString(),
+            //     'channels' => '#grouscope_applog',
+            //     'initial_comment' => 'WordCloudの処理でエラーがでたよー:sob:'
+            // ]);
             return response($id, 500);
         }
 
