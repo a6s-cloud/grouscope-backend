@@ -52,5 +52,9 @@ RUN apt-get update && \
         docker-php-ext-install mysqli && \
         # Finally clean cache and remove its dir
         apt-get autoclean -y && \
-        rm -rf /var/lib/apt/lists/* /tmp/pear/
+        rm -rf /var/lib/apt/lists/* /tmp/pear/ && \
+        # composer
+        curl -s http://getcomposer.org/installer | php && \
+        echo "export PATH=${PATH}:/var/www/vendor/bin" >> ~/.bashrc && \
+        mv composer.phar /usr/local/bin/composer
 
