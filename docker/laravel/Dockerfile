@@ -59,7 +59,7 @@ RUN apt-get update && \
         mv composer.phar /usr/local/bin/composer && \
         usermod -s /bin/bash www-data
 
-COPY groucsope_entrypoint.sh /opt/groucsope_entrypoint.sh
-CMD /opt/groucsope_entrypoint.sh
-RUN chmod 755 /opt/groucsope_entrypoint.sh
+COPY grouscope_entrypoint.sh /opt/grouscope_entrypoint.sh
+CMD /opt/grouscope_entrypoint.sh
+RUN chmod 755 /opt/grouscope_entrypoint.sh
 
