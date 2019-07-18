@@ -56,5 +56,10 @@ RUN apt-get update && \
         # composer
         curl -s http://getcomposer.org/installer | php && \
         echo "export PATH=${PATH}:/var/www/vendor/bin" >> ~/.bashrc && \
-        mv composer.phar /usr/local/bin/composer
+        mv composer.phar /usr/local/bin/composer && \
+        usermod -s /bin/bash www-data
+
+COPY groucsope_entrypoint.sh /opt/groucsope_entrypoint.sh
+CMD /opt/groucsope_entrypoint.sh
+RUN chmod 755 /opt/groucsope_entrypoint.sh
 
