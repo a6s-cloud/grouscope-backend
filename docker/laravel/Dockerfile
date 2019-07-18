@@ -3,7 +3,7 @@ MAINTAINER Tsutomu Nakamura<tsuna.0x00@gmail.com>
 
 RUN apt-get update && \
         DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
-        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libfreetype6-dev libjpeg-dev libpng-dev libwebp-dev libgmp-dev libzip-dev zip unzip mysql-client && \
+        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libfreetype6-dev libjpeg-dev libpng-dev libwebp-dev libgmp-dev libzip-dev zip unzip mysql-client git && \
         docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/inclue/ --with-webp-dir=/usr/include/ && \
         docker-php-ext-configure zip --with-libzip && \
         docker-php-ext-install gd gmp pdo_mysql zip && \
