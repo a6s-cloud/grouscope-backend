@@ -1,3 +1,4 @@
+# docker run --name laravel --hostname laravel --net dmz-network --volume ${PWD}/../../a6s-cloud:/var/www/html -ti tsutomu/laravel bash
 FROM php:7.3-fpm-stretch
 MAINTAINER Tsutomu Nakamura<tsuna.0x00@gmail.com>
 
