@@ -59,7 +59,10 @@ RUN apt-get update && \
         curl -s http://getcomposer.org/installer | php && \
         echo "export PATH=${PATH}:/var/www/vendor/bin" >> ~/.bashrc && \
         mv composer.phar /usr/local/bin/composer && \
-        usermod -s /bin/bash www-data
+        usermod -s /bin/bash www-data && \
+        # Setting php.ini
+        cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
+        sed -i -e 's/max_execution_time = .*/max_execution_time = 600/' /usr/local/etc/php/php.ini
 
 COPY grouscope_entrypoint.sh /opt/grouscope_entrypoint.sh
 RUN chmod 755 /opt/grouscope_entrypoint.sh
