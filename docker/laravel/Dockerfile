@@ -3,9 +3,13 @@
 FROM php:7.3-fpm-stretch
 MAINTAINER Tsutomu Nakamura<tsuna.0x00@gmail.com>
 
+COPY grouscope_entrypoint.sh /opt/grouscope_entrypoint.sh
+COPY install_git_modules.sh /opt/install_git_modules.sh
+
 RUN apt-get update && \
         DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
         DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libfreetype6-dev libjpeg-dev libpng-dev libwebp-dev libgmp-dev libzip-dev zip unzip mysql-client git && \
+        DEBIAN_FRONTEND=noninteractive apt-get install -y python3 python3-pip && \
         docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/inclue/ --with-webp-dir=/usr/include/ && \
         docker-php-ext-configure zip --with-libzip && \
         docker-php-ext-install gd gmp pdo_mysql zip && \
@@ -62,14 +66,8 @@ RUN apt-get update && \
         usermod -s /bin/bash www-data && \
         # Setting php.ini
         cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
-        sed -i -e 's/max_execution_time = .*/max_execution_time = 600/' /usr/local/etc/php/php.ini
-
-RUN apt-get update && \
-        DEBIAN_FRONTEND=noninteractive apt-get install -y python3 python3-pip
-
-COPY grouscope_entrypoint.sh /opt/grouscope_entrypoint.sh
-COPY install_git_modules.sh /opt/install_git_modules.sh
-RUN chmod 755 /opt/grouscope_entrypoint.sh && \
+        sed -i -e 's/max_execution_time = .*/max_execution_time = 600/' /usr/local/etc/php/php.ini && \
+        chmod 755 /opt/grouscope_entrypoint.sh && \
         chmod 755 /opt/install_git_modules.sh
 
 CMD ["/opt/grouscope_entrypoint.sh"]
