@@ -64,8 +64,13 @@ RUN apt-get update && \
         cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
         sed -i -e 's/max_execution_time = .*/max_execution_time = 600/' /usr/local/etc/php/php.ini
 
+RUN apt-get update && \
+        DEBIAN_FRONTEND=noninteractive apt-get install -y python3 python3-pip
+
 COPY grouscope_entrypoint.sh /opt/grouscope_entrypoint.sh
-RUN chmod 755 /opt/grouscope_entrypoint.sh
+COPY install_git_modules.sh /opt/install_git_modules.sh
+RUN chmod 755 /opt/grouscope_entrypoint.sh && \
+        chmod 755 /opt/install_git_modules.sh
 
 CMD ["/opt/grouscope_entrypoint.sh"]
 
