@@ -1,18 +1,24 @@
+#!/bin/bash
 
 main() {
-    cd /var/www/html
-    composer install
-    if [[ ! -f .env ]]; then
-        cp -ip .env.example .env
-        php artisan key:generate
-    fi
+    set -e
 
-    # TODO:
+    chown -R www-data:www-data /var/www/html
+    su www-data -c '
+        set -e
+        cd /var/www/html/a6s-cloud
 
-    true
+        composer install
+
+        if [[ ! -f .env ]]; then
+            cp -ip .env.example .env
+            php artisan key:generate
+        fi
+    '
+
+    set -- php-fpm "$@"
+    exec "$@"
 }
-
-main || exit 1
+main "$@"
 
 exit 0
-

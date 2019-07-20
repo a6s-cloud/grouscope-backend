@@ -1,4 +1,5 @@
-# docker run --name laravel --hostname laravel --net dmz-network --volume ${PWD}/../../a6s-cloud:/var/www/html -ti tsutomu/laravel bash
+# docker build -t a6scloud/laravel .
+# docker run --name laravel --hostname laravel --net a6s --volume ${PWD}/../../a6s-cloud:/var/www/html/a6s-cloud -ti a6scloud/laravel
 FROM php:7.3-fpm-stretch
 MAINTAINER Tsutomu Nakamura<tsuna.0x00@gmail.com>
 
@@ -61,6 +62,7 @@ RUN apt-get update && \
         usermod -s /bin/bash www-data
 
 COPY grouscope_entrypoint.sh /opt/grouscope_entrypoint.sh
-CMD /opt/grouscope_entrypoint.sh
 RUN chmod 755 /opt/grouscope_entrypoint.sh
+
+CMD ["/opt/grouscope_entrypoint.sh"]
 
