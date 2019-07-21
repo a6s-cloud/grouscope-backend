@@ -7,10 +7,22 @@ networks:
 
 services:
   nginx:
+    container_name: grouscope_nginx
     image:
       a6scloud/grouscope-nginx:latest
     ports:
       - "${NGINX_BIND_PORT}:80"
+    depends_on:
+      - laravel
+    networks:
+      - a6s
+
+  laravel:
+    container_name: grouscope_laravel
+    image:
+      a6scloud/grouscope-laravel:latest
+    volumes:
+      - ./a6s-cloud:/var/www/html/a6s-cloud
     networks:
       - a6s
 
