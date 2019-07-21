@@ -128,9 +128,9 @@ class AnalysisRequestService
     {
         $process = new Process([
             'python3',
-            base_path() . '/../a6s-cloud-batch/src/createWordCloud.py',
+            '/opt/a6s-cloud-batch/src/createWordCloud.py',
             $this->localStoragePath . $this->getTweetsFileForWordcloud(),
-            base_path() . '/../RictyDiminished/RictyDiminished-Bold.ttf',
+            '/opt/RictyDiminished/RictyDiminished-Bold.ttf',
             $this->publicStoragePath . $this->getImageFileForWordcloud()
         ]);
         $process->run();
