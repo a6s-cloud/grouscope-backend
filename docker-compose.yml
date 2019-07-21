@@ -1,0 +1,16 @@
+version: '3.7'
+
+networks:
+  a6s:
+    name: a6s
+    driver: bridge
+
+services:
+  nginx:
+    image:
+      a6scloud/grouscope-nginx:latest
+    ports:
+      - "${NGINX_BIND_PORT}:80"
+    networks:
+      - a6s
+
