@@ -12,10 +12,10 @@ services:
       a6scloud/grouscope-nginx:latest
     ports:
       - "${NGINX_BIND_PORT}:80"
-    depends_on:
-      - laravel
     networks:
       - a6s
+    depends_on:
+      - laravel
 
   laravel:
     container_name: grouscope_laravel
@@ -23,6 +23,17 @@ services:
       a6scloud/grouscope-laravel:latest
     volumes:
       - ./a6s-cloud:/var/www/html/a6s-cloud
+    networks:
+      - a6s
+    depends_on:
+      - mysql
+
+  mysql:
+    container_name: grouscope_mysql
+    image:
+      mysql:8
+    volumes:
+      - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
       - a6s
 
