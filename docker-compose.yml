@@ -21,6 +21,12 @@ services:
     container_name: grouscope_laravel
     image:
       a6scloud/grouscope-laravel:latest
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=grouscope_mysql
+      - DB_DATABASE=a6s_cloud
+      - DB_USERNAME=default
+      - DB_PASSWORD=secret
     volumes:
       - ./a6s-cloud:/var/www/html/a6s-cloud
     networks:
@@ -30,8 +36,13 @@ services:
 
   mysql:
     container_name: grouscope_mysql
+    networks:
+      a6s:
+        - mysql
     image:
       mysql:8
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
     volumes:
       - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
