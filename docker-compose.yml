@@ -9,7 +9,7 @@ services:
   nginx:
     container_name: grouscope_nginx
     image:
-      a6scloud/grouscope-nginx:latest
+      a6scloud/grouscope-nginx:${NGINX_IMAGE_TAG}
     ports:
       - "${NGINX_BIND_PORT}:80"
     networks:
@@ -20,7 +20,7 @@ services:
   laravel:
     container_name: grouscope_laravel
     image:
-      a6scloud/grouscope-laravel:latest
+      a6scloud/grouscope-laravel:${LARAVEL_IMAGE_TAG}
     environment:
       - DB_CONNECTION=mysql
       - DB_HOST=grouscope_mysql
@@ -40,7 +40,9 @@ services:
       a6s:
         - mysql
     image:
-      mysql:8
+      mysql:${MYSQL_IMAGE_TAG}
+    ports:
+      - "${MYSQL_BIND_PORT}:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=secret
     volumes:
