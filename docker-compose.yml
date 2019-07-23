@@ -22,11 +22,14 @@ services:
     image:
       a6scloud/grouscope-laravel:${LARAVEL_IMAGE_TAG}
     environment:
-      - DB_CONNECTION=mysql
       - DB_HOST=grouscope_mysql
       - DB_DATABASE=a6s_cloud
       - DB_USERNAME=default
       - DB_PASSWORD=secret
+      - CONSUMER_KEY=x
+      - CONSUMER_SECRET=x
+      - ACCESS_TOKEN=x
+      - ACCESS_TOKEN_SECRET=x
     volumes:
       - ./a6s-cloud:/var/www/html/a6s-cloud
     networks:
