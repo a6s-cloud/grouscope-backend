@@ -6,6 +6,7 @@ RETRY_MAX=60
 
 main() {
     while ! check_connection && [[ $COUNT -le $RETRY_MAX ]]; do
+        echo "Waiting until the DB has been up."
         sleep 1
         (( ++COUNT ))
     done
@@ -15,7 +16,7 @@ main() {
 
 check_connection() {
     mysql -h mysql -u default -psecret \
-            -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'a6s_cloud'" | grep -q "a6s_cloud"
+            -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'a6s_cloud'" 2> /dev/null | grep -q "a6s_cloud"
     local result=$?
 
     [[ "$result" -ne 0 ]] && return 1
