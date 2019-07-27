@@ -5,6 +5,7 @@ MAINTAINER Tsutomu Nakamura<tsuna.0x00@gmail.com>
 
 COPY grouscope_entrypoint.sh /opt/grouscope_entrypoint.sh
 COPY install_git_modules.sh /opt/install_git_modules.sh
+COPY wait_until_mysql_started.sh /opt/wait_until_mysql_started.sh
 
 RUN apt-get update && \
         DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
@@ -68,7 +69,8 @@ RUN apt-get update && \
         cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
         sed -i -e 's/max_execution_time = .*/max_execution_time = 600/' /usr/local/etc/php/php.ini && \
         chmod 755 /opt/grouscope_entrypoint.sh && \
-        chmod 755 /opt/install_git_modules.sh
+        chmod 755 /opt/install_git_modules.sh && \
+        chmod 755 /opt/wait_until_mysql_started.sh
 
 CMD ["/opt/grouscope_entrypoint.sh"]
 

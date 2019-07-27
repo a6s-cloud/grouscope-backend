@@ -1,0 +1,55 @@
+version: '3.7'
+
+networks:
+  a6s:
+    name: a6s
+    driver: bridge
+
+services:
+  nginx:
+    container_name: grouscope_nginx
+    image:
+      a6scloud/grouscope-nginx:${NGINX_IMAGE_TAG}
+    ports:
+      - "${NGINX_BIND_PORT}:80"
+    networks:
+      - a6s
+    depends_on:
+      - laravel
+
+  laravel:
+    container_name: grouscope_laravel
+    image:
+      a6scloud/grouscope-laravel:${LARAVEL_IMAGE_TAG}
+    environment:
+      - DB_HOST=grouscope_mysql
+      - DB_DATABASE=a6s_cloud
+      - DB_USERNAME=default
+      - DB_PASSWORD=secret
+      - CONSUMER_KEY=${CONSUMER_KEY}
+      - CONSUMER_SECRET=${CONSUMER_SECRET}
+      - ACCESS_TOKEN=${ACCESS_TOKEN}
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+    volumes:
+      - ./a6s-cloud:/var/www/html/a6s-cloud
+    networks:
+      - a6s
+    depends_on:
+      - mysql
+
+  mysql:
+    container_name: grouscope_mysql
+    networks:
+      a6s:
+        - mysql
+    image:
+      mysql:${MYSQL_IMAGE_TAG}
+    ports:
+      - ${MYSQL_BIND_PORT}:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+    volumes:
+      - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - a6s
+
