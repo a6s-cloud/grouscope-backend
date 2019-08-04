@@ -11,7 +11,12 @@ main() {
 
 
     composer install
-    chown -R www-data:www-data /var/www/html
+    chown -R www-data:www-data .
+
+    source .env
+    if [[ APP_ENV != "production" ]]; then
+        find . | xargs chmod o+w .
+    fi
 
     exec php-fpm "$@"
 }
