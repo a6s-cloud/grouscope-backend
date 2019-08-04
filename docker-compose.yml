@@ -31,7 +31,7 @@ services:
       - ACCESS_TOKEN=${ACCESS_TOKEN}
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
     volumes:
-      - ./a6s-cloud:/var/www/html/a6s-cloud
+      - ./:/var/www/html
     networks:
       - a6s
     depends_on:
