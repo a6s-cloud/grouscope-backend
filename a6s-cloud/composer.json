@@ -64,7 +64,7 @@
             "@php artisan migrate",
             "@php artisan db:seed",
             "pip3 install -r requirements.txt",
-            "/opt/install_git_modules.sh \"https://github.com/edihbrandon/RictyDiminished.git\" \"https://github.com/nsuzuki7713/a6s-cloud-batch.git\""
+            "git submodule update --init --recursive"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
