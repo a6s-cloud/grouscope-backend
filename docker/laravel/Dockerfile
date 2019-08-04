@@ -3,10 +3,6 @@
 FROM php:7.3-fpm-stretch
 MAINTAINER Tsutomu Nakamura<tsuna.0x00@gmail.com>
 
-COPY grouscope_entrypoint.sh /opt/grouscope_entrypoint.sh
-COPY install_git_modules.sh /opt/install_git_modules.sh
-COPY wait_until_mysql_started.sh /opt/wait_until_mysql_started.sh
-
 RUN apt-get update && \
         DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
         DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libfreetype6-dev libjpeg-dev libpng-dev libwebp-dev libgmp-dev libzip-dev zip unzip mysql-client git && \
@@ -67,8 +63,13 @@ RUN apt-get update && \
         usermod -s /bin/bash www-data && \
         # Setting php.ini
         cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini && \
-        sed -i -e 's/max_execution_time = .*/max_execution_time = 600/' /usr/local/etc/php/php.ini && \
-        chmod 755 /opt/grouscope_entrypoint.sh && \
+        sed -i -e 's/max_execution_time = .*/max_execution_time = 600/' /usr/local/etc/php/php.ini
+
+COPY grouscope_entrypoint.sh /opt/grouscope_entrypoint.sh
+COPY install_git_modules.sh /opt/install_git_modules.sh
+COPY wait_until_mysql_started.sh /opt/wait_until_mysql_started.sh
+
+RUN chmod 755 /opt/grouscope_entrypoint.sh && \
         chmod 755 /opt/install_git_modules.sh && \
         chmod 755 /opt/wait_until_mysql_started.sh
 
