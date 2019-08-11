@@ -66,11 +66,9 @@ RUN apt-get update && \
         sed -i -e 's/max_execution_time = .*/max_execution_time = 600/' /usr/local/etc/php/php.ini
 
 COPY grouscope_entrypoint.sh /opt/grouscope_entrypoint.sh
-COPY install_git_modules.sh /opt/install_git_modules.sh
 COPY wait_until_mysql_started.sh /opt/wait_until_mysql_started.sh
 
 RUN chmod 755 /opt/grouscope_entrypoint.sh && \
-        chmod 755 /opt/install_git_modules.sh && \
         chmod 755 /opt/wait_until_mysql_started.sh
 
 CMD ["/opt/grouscope_entrypoint.sh"]
