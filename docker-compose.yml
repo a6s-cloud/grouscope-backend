@@ -1,8 +1,7 @@
-version: '3.7'
+version: '3'
 
 networks:
   a6s:
-    name: a6s
     driver: bridge
 
 services:
